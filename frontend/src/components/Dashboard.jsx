@@ -21,14 +21,16 @@ export default function Dashboard({ user, onLogout }) {
     });
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState(""); // Track input
+    const [activeSearch, setActiveSearch] = useState(""); // Track triggered search
 
     useEffect(() => {
         fetchDashboardStats();
     }, []);
 
     useEffect(() => {
-        fetchEvents(currentPage);
-    }, [currentPage]);
+        fetchEvents(currentPage, activeSearch);
+    }, [currentPage, activeSearch]);
 
     const fetchDashboardStats = async () => {
         try {
@@ -45,20 +47,66 @@ export default function Dashboard({ user, onLogout }) {
         }
     };
 
-    const fetchEvents = async (page) => {
+    const fetchEvents = async (page, search = "") => {
+        setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`http://localhost:8000/api/v1/admin/events?page=${page}&limit=10`, {
+            // Construct Query Params
+            const params = new URLSearchParams({
+                page: page,
+                limit: 10
+            });
+            if (search && search.trim() !== "") {
+                params.append('search', search.trim());
+            }
+
+            const res = await fetch(`http://localhost:8000/api/v1/events?${params.toString()}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+
             if (res.ok) {
                 const data = await res.json();
-                setEventsData(data);
+
+                // ROBUST HANDLING: Check if array or object
+                if (data && Array.isArray(data.data)) {
+                    // BACKEND UPGRADE: API now returns { data, total, page, limit }
+                    setEventsData({
+                        data: data.data,
+                        total: data.total,
+                        page: data.page,
+                        limit: data.limit
+                    });
+                } else if (Array.isArray(data)) {
+                    // Fallback for old structure or during transition
+                    setEventsData({
+                        data: data,
+                        total: 100, // Mock total
+                        page: page,
+                        limit: 10
+                    });
+                } else {
+                    // Fallback for empty or unexpected structure
+                    setEventsData({
+                        data: [],
+                        total: 0,
+                        page: page,
+                        limit: 10
+                    });
+                }
+            } else {
+                console.error("API Error:", res.status);
             }
         } catch (err) {
             console.error("Failed to fetch events", err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleSearch = (e) => {
+        if (e.key === 'Enter') {
+            setCurrentPage(1);
+            setActiveSearch(searchQuery);
         }
     };
 
@@ -116,6 +164,9 @@ export default function Dashboard({ user, onLogout }) {
                                 type="text"
                                 placeholder="Search events, venues..."
                                 className="bg-white border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-sky-500 w-64"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyDown={handleSearch}
                             />
                         </div>
                         <button className="relative text-slate-500 hover:text-sky-600">
@@ -185,11 +236,17 @@ export default function Dashboard({ user, onLogout }) {
 
                     {/* EVENTS LIST */}
                     <div className="space-y-4">
-                        {eventsData.data.map((event) => (
-                            <EventCard key={event.id} event={event} />
-                        ))}
-                        {eventsData.data.length === 0 && (
-                            <div className="text-center py-10 text-slate-500">No events found matching criteria.</div>
+                        {loading ? (
+                            <div className="text-center py-10 text-slate-500">Loading events...</div>
+                        ) : (
+                            <>
+                                {eventsData.data?.map((event) => (
+                                    <EventCard key={event.id} event={event} />
+                                ))}
+                                {(!eventsData.data || eventsData.data.length === 0) && (
+                                    <div className="text-center py-10 text-slate-500">No events found matching criteria.</div>
+                                )}
+                            </>
                         )}
                     </div>
 
@@ -203,7 +260,7 @@ export default function Dashboard({ user, onLogout }) {
                             ‹
                         </button>
 
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                        {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map(page => (
                             <button
                                 key={page}
                                 onClick={() => handlePageChange(page)}

@@ -25,7 +25,14 @@ export default function App() {
       const res = await fetch('/api/v1/events');
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
-      setEvents(data);
+      // Handle new API structure { data: [], total: ... }
+      if (data && Array.isArray(data.data)) {
+        setEvents(data.data);
+      } else if (Array.isArray(data)) {
+        setEvents(data);
+      } else {
+        setEvents([]);
+      }
     } catch (err) {
       console.error("Failed to fetch events", err);
       setError("Could not load events. Ensure backend is running.");

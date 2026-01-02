@@ -115,3 +115,70 @@ async def google_login(token_data: GoogleToken, session: AsyncSession = Depends(
 @router.get("/me", response_model=UserRead)
 async def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
+
+# --- FORGOT PASSWORD FLOW ---
+
+from pydantic import BaseModel, EmailStr
+from datetime import datetime
+from app.core.email_utils import send_reset_email
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    otp: str
+    new_password: str
+
+@router.post("/forgot-password")
+async def forgot_password(request: ForgotPasswordRequest, session: AsyncSession = Depends(get_session)):
+    # 1. Find User
+    statement = select(User).where(User.email == request.email)
+    result = await session.execute(statement)
+    user = result.scalars().first()
+    
+    if not user:
+        # Security: Don't reveal if user exists. Just pretend success.
+        # But for dev, we can log it.
+        print(f"Forgot PW Request for non-existent email: {request.email}")
+        return {"message": "If this email is registered, you will receive a reset OTP."}
+
+    # 2. Generate OTP (6 digits)
+    otp = "".join([str(secrets.randbelow(10)) for _ in range(6)])
+    user.reset_otp = otp
+    user.otp_expires_at = datetime.utcnow() + timedelta(minutes=10)
+    
+    session.add(user)
+    await session.commit()
+    
+    # 3. Send Email
+    await send_reset_email(user.email, otp)
+    
+    return {"message": "OTP sent to your email."}
+
+@router.post("/reset-password")
+async def reset_password(request: ResetPasswordRequest, session: AsyncSession = Depends(get_session)):
+    # 1. Find User
+    statement = select(User).where(User.email == request.email)
+    result = await session.execute(statement)
+    user = result.scalars().first()
+    
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid request")
+
+    # 2. Verify OTP
+    if not user.reset_otp or user.reset_otp != request.otp:
+        raise HTTPException(status_code=400, detail="Invalid OTP")
+        
+    if not user.otp_expires_at or user.otp_expires_at < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="OTP has expired")
+        
+    # 3. Reset Password
+    user.hashed_password = get_password_hash(request.new_password)
+    user.reset_otp = None
+    user.otp_expires_at = None
+    
+    session.add(user)
+    await session.commit()
+    
+    return {"message": "Password reset successfully. You can now login."}

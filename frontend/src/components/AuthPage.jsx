@@ -14,12 +14,18 @@ export default function AuthPage({ onBack, onComplete, initialMode = 'login' }) 
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    const [resetStep, setResetStep] = useState(1); // 1: Email, 2: OTP & New Password
+    const [otp, setOtp] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+
     // Toggle Mode
     const toggleMode = (newMode) => {
         setMode(newMode);
         setAgreed(false);
         setError(null);
-        // Reset form slightly if needed, but keeping state is often friendlier
+        setResetStep(1);
+        setOtp('');
+        setNewPassword('');
     };
 
     const handleLogin = async (e) => {
@@ -114,6 +120,51 @@ export default function AuthPage({ onBack, onComplete, initialMode = 'login' }) 
         }
     };
 
+    const handleForgotPassword = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+
+        try {
+            if (resetStep === 1) {
+                // Step 1: Request OTP
+                const res = await fetch('/api/v1/auth/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email }),
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'Request failed');
+
+                alert(data.message); // Should say OTP sent
+                setResetStep(2);
+            } else {
+                // Step 2: Reset Password
+                const res = await fetch('/api/v1/auth/reset-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email,
+                        otp,
+                        new_password: newPassword
+                    }),
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'Reset failed');
+
+                alert("Password reset successfully! Please login.");
+                setMode('login');
+            }
+
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="min-h-screen flex text-slate-200 font-sans">
 
@@ -165,7 +216,11 @@ export default function AuthPage({ onBack, onComplete, initialMode = 'login' }) 
                         <p className="text-slate-400">
                             {mode === 'login' && 'Enter your details to access your dashboard.'}
                             {mode === 'signup' && 'Start your journey with us today.'}
-                            {mode === 'forgot' && 'No worries, we\'ll send you reset instructions.'}
+                            {mode === 'forgot' && (
+                                resetStep === 1
+                                    ? 'No worries, we\'ll send you reset instructions.'
+                                    : 'Check your email for the OTP.'
+                            )}
                         </p>
                     </div>
 
@@ -188,7 +243,7 @@ export default function AuthPage({ onBack, onComplete, initialMode = 'login' }) 
                     )}
 
                     {/* Form */}
-                    <form className="space-y-5" onSubmit={mode === 'login' ? handleLogin : handleSignup}>
+                    <form className="space-y-5" onSubmit={mode === 'forgot' ? handleForgotPassword : (mode === 'login' ? handleLogin : handleSignup)}>
                         {/* Error Message */}
                         {error && (
                             <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm p-3 rounded-lg text-center">
@@ -196,6 +251,7 @@ export default function AuthPage({ onBack, onComplete, initialMode = 'login' }) 
                             </div>
                         )}
 
+                        {/* FULL NAME - SIGNUP ONLY */}
                         {mode === 'signup' && (
                             <div className="space-y-1.5">
                                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Full Name</label>
@@ -210,18 +266,62 @@ export default function AuthPage({ onBack, onComplete, initialMode = 'login' }) 
                             </div>
                         )}
 
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Email Address</label>
-                            <input
-                                type="email"
-                                placeholder="name@example.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-sky-500 transition-colors placeholder:text-slate-600"
-                                required
-                            />
-                        </div>
+                        {/* EMAIL ADDRESS - ALL MODES */}
+                        {(mode !== 'forgot' || resetStep === 1) && (
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Email Address</label>
+                                <input
+                                    type="email"
+                                    placeholder="name@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-sky-500 transition-colors placeholder:text-slate-600"
+                                    required={mode !== 'forgot' || resetStep === 1}
+                                    disabled={mode === 'forgot' && resetStep === 2}
+                                />
+                            </div>
+                        )}
 
+                        {/* FORGOT PASSWORD STEP 2 - OTP & NEW PASSWORD */}
+                        {mode === 'forgot' && resetStep === 2 && (
+                            <>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Enter OTP (Sent to Email)</label>
+                                    <input
+                                        type="text"
+                                        placeholder="123456"
+                                        value={otp}
+                                        onChange={(e) => setOtp(e.target.value)}
+                                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-sky-500 transition-colors placeholder:text-slate-600 tracking-widest text-center font-mono text-lg"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">New Password</label>
+                                    <div className="relative">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            placeholder="Enter new password"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-sky-500 transition-colors placeholder:text-slate-600 pr-10"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 top-3 text-slate-500 hover:text-white"
+                                        >
+                                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+
+                        {/* PASSWORD - LOGIN/SIGNUP */}
                         {mode !== 'forgot' && (
                             <>
                                 <div className="space-y-1.5">
@@ -304,7 +404,7 @@ export default function AuthPage({ onBack, onComplete, initialMode = 'login' }) 
                                 <>
                                     {mode === 'login' && 'Sign In'}
                                     {mode === 'signup' && 'Create Account'}
-                                    {mode === 'forgot' && 'Send Reset Link'}
+                                    {mode === 'forgot' && (resetStep === 1 ? 'Send Reset Link' : 'Reset Password')}
                                 </>
                             )}
                         </button>

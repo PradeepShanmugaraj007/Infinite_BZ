@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from datetime import datetime
 from sqlmodel import SQLModel, Field
 from sqlalchemy import Column
@@ -46,6 +46,10 @@ class UserBase(SQLModel):
 class User(UserBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     hashed_password: str
+    
+    # Forgot Password Fields
+    reset_otp: Optional[str] = None
+    otp_expires_at: Optional[datetime] = None
 
 class UserCreate(UserBase):
     password: str
@@ -62,3 +66,9 @@ class TokenData(SQLModel):
 
 class GoogleToken(SQLModel):
     token: str
+
+class EventListResponse(SQLModel):
+    data: List[Event]
+    total: int
+    page: int
+    limit: int
