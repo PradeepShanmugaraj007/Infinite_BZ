@@ -30,6 +30,24 @@ class Event(SQLModel, table=True):
     
     created_at: datetime = Field(default_factory=datetime.now)
 
+class EventCreate(SQLModel):
+    title: str
+    description: Optional[str] = None
+    start_time: datetime
+    end_time: Optional[datetime] = None
+    venue_name: Optional[str] = None
+    venue_address: Optional[str] = None
+    image_url: Optional[str] = None
+    category: Optional[str] = "Business"
+    is_free: bool = True
+    online_event: bool = False
+    
+    # Pro Fields
+    organizer_name: Optional[str] = None
+    organizer_email: Optional[str] = None
+    price: Optional[str] = None
+    capacity: Optional[str] = None
+
 class UserRegistration(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     event_id: int = Field(foreign_key="event.id")

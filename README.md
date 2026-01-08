@@ -1,77 +1,60 @@
-# Infinite Tech AI - Event Aggregator Web Application
+# InfiniteBZ - Community Event Platform
 
-A comprehensive full-stack web application designed to aggregate, filter, and manage professional networking events. Built for "Infinite Tech AI", it features auto-registration capabilities using Playwright automation.
+InfiniteBZ is a comprehensive event management platform tailored for local communities (currently Chennai). It aggregates events from multiple sources (like Eventbrite) and allows users to create and manage their own listing directly on the platform.
 
-## 🚀 Technologies Used
+## Features
 
-### Frontend (Client-Side)
-*   **React (Vite)**: Fast, modern frontend framework.
-*   **Tailwind CSS**: Utility-first CSS framework for the custom "Dark/Cyan" theme.
-*   **Lucide React**: Beautiful, consistent icon set.
-*   **Axios / Fetch**: For API communication.
-*   **React Router**: For navigation between Dashboard, Auth, and Landing pages.
+*   **Aggregated Feed**: Automatically scrapes and displays tech and networking events from external sources.
+*   **User Events**: detailed "Create Event" wizard for users to host their own meetups.
+*   **My Events Dashboard**: A personalized dashboard for organizers to track active events and registrations.
+*   **Rich Event Details**: Premium, immersive event detail views with agenda, speakers, and location maps.
+*   **Authentication**: Secure JWT-based signup and login system.
+*   **Admin Analytics**: Backend stats for track platform growth.
 
-### Backend (Server-Side)
-*   **FastAPI (Python 3.10+)**: High-performance "async" web framework.
-*   **Uvicorn**: ASGI server implementation.
-*   **Playwright**: Browser automation library for the Auto-Registration feature (Anti-CAPTCHA support).
-*   **APScheduler**: For scheduling background scraping tasks.
-*   **Pydantic**: Data validation and settings management.
+## Tech Stack
 
-### Database & Storage
-*   **PostgreSQL**: Primary relational database.
-*   **SQLModel / SQLAlchemy**: ORM (Object Relational Mapper) for database interactions.
-*   **Alembic**: Database migration tool.
+### Frontend
+*   **React (Vite)**: Fast, modern UI library.
+*   **Tailwind CSS**: For a sleek, dark-themed responsive design.
+*   **Lucide React**: Beautiful, consistent iconography.
 
-### Authentication
-*   **JWT (JSON Web Tokens)**: Secure, stateless user sessions.
-*   **Google OAuth2**: "Sign in with Google" integration.
-*   **Passlib**: Secure password hashing (Bcrypt).
+### Backend
+*   **FastAPI**: High-performance Python framework.
+*   **SQLModel / SQLAlchemy**: Async ORM for Postgres interaction.
+*   **PostgreSQL**: Robust relational database.
+*   **Playwright**: For advanced web scraping capabilities.
+*   **APScheduler**: For background tasks and data synchronization.
 
-## 📂 Key Features
+## Setup & Run
 
-1.  **Event Aggregation**: Scrapes multiple sources (Eventbrite, Meetup) to create a central feed.
-2.  **Auto-Registration**: "One-Click" registration for free events using a background browser robot.
-3.  **Smart Filtering**: Filter events by City, Category, Date, Price, and Mode.
-4.  **Premium UI**: Dark mode dashboard with "Infinite Tech" branding.
+### Prerequisites
+*   Node.js & npm
+*   Python 3.10+
+*   PostgreSQL Database
 
-## 🛠️ Setup Instructions
-
-### 1. Clone Repository
-```bash
-git clone https://github.com/PradeepShanmugaraj007/Infinite_BZ.git
-cd Infinite_BZ
-```
-
-### 2. Backend Setup
-Navigate to the backend folder:
+### 1. Backend Setup
 ```bash
 cd backend
-```
-
-Create a virtual environment & install dependencies:
-```bash
 python -m venv venv
-# Activate: .\venv\Scripts\activate (Windows) or source venv/bin/activate (Mac/Linux)
+# Activate venv (Windows: .\venv\Scripts\activate, Mac/Linux: source venv/bin/activate)
 pip install -r requirements.txt
 playwright install
-```
-
-Run the server:
-```bash
 python run.py
 ```
-*(Server runs on http://localhost:8000)*
+*   Server runs on `http://localhost:8000`
+*   Docs available at `http://localhost:8000/docs`
 
-### 3. Frontend Setup
-Navigate to the frontend folder:
+### 2. Frontend Setup
 ```bash
 cd frontend
-```
-
-Install packages and run:
-```bash
 npm install
 npm run dev
 ```
-*(Frontend runs on http://localhost:5174)*
+*   App runs on `http://localhost:5173` (or similar port)
+
+## Project Structure
+*   `/backend`: FastAPI application, database models, and scraper logic.
+*   `/frontend`: React application, components, and assets.
+
+## License
+MIT

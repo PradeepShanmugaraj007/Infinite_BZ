@@ -4,8 +4,10 @@ from sqlalchemy.future import select
 from typing import List
 
 from app.core.database import get_session
-from app.models.schemas import Event, UserRegistration, EventListResponse
+from app.models.schemas import Event, UserRegistration, EventListResponse, User, EventCreate
 from app.services.scraper import scrape_events_playwright # Async import
+from app.auth import get_current_user
+import uuid
 
 router = APIRouter()
 
@@ -37,6 +39,108 @@ async def sync_events(city: str = "chennai", session: AsyncSession = Depends(get
             
     await session.commit()
     return {"status": "success", "added": saved_count, "total_found": len(events_data)}
+
+# --- 1.5 CREATE EVENT (User Generated) ---
+
+@router.post("/events", response_model=Event)
+async def create_event(
+    event_data: EventCreate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session)
+):
+    """
+    Allows authenticated users to create a new event.
+    """
+    # Generate unique internal ID
+    custom_id = f"chk-{uuid.uuid4()}"
+    
+    # Create Event Object
+    # Extract Pro fields for raw_data storage
+    raw_data_dump = {
+        "source": "InfiniteBZ", 
+        "created_by": current_user.email,
+        "organizer_email": event_data.organizer_email,
+        "price": event_data.price,
+        "capacity": event_data.capacity
+    }
+    
+    new_event = Event(
+        **event_data.dict(exclude={"organizer_email", "price", "capacity"}), # Exclude non-db columns if they match exact table columns, or just pass as is if ignored by SQLModel init (safer to allow)
+        eventbrite_id=custom_id,
+        url=f"https://infinitebz.com/events/{custom_id}", 
+        organizer_name=event_data.organizer_name or current_user.full_name or "Community Member",
+        raw_data=raw_data_dump
+    )
+    
+    session.add(new_event)
+    await session.commit()
+    await session.refresh(new_event)
+    
+    return new_event
+
+    return new_event
+
+@router.get("/events/my-events")
+async def get_my_events(
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session)
+):
+    """
+    Fetch events created by the current user.
+    """
+    # Query events where raw_data->>'created_by' matches email
+    # Note: JSONB querying in SQLModel/SQLAlchemy
+    from sqlalchemy import cast, String
+    from sqlalchemy.dialects.postgresql import JSONB
+    
+    # 1. Get Events
+    query = select(Event).where(
+        cast(Event.raw_data['created_by'], String) == f'"{current_user.email}"' 
+        # Note: JSON value might be quoted or not depending on driver. 
+        # Safest is often astext or explicit cast. 
+        # Let's try simple python filtration if list is small, or specific operator if large.
+        # Given potential complexities with JSON operators in asyncpg/sqlmodel, 
+        # let's fetch all "Source=InfiniteBZ" and filter in python for MVP reliability 
+        # unless we want to risk syntax errors.
+        # Actually, let's try the proper JSONB contains operator which is cleaner.
+    )
+    
+    # Alternative: Use the contains operator @>
+    # query = select(Event).where(Event.raw_data.contains({"created_by": current_user.email}))
+    
+    # Let's stick to the containment operator, it's standard PG.
+    stmt = select(Event).where(Event.raw_data.contains({"created_by": current_user.email}))
+    result = await session.execute(stmt)
+    my_events = result.scalars().all()
+    
+    # 2. Calculate Stats
+    active_count = len(my_events) # Assuming all are active for now
+    pending_count = 0 
+    total_registrations = 0
+    
+    # For each event, get registration count (this could be optimized with a join)
+    events_with_stats = []
+    for event in my_events:
+        # Count registrations
+        reg_stmt = select(func.count()).select_from(UserRegistration).where(UserRegistration.event_id == event.id)
+        reg_res = await session.execute(reg_stmt)
+        reg_count = reg_res.scalar()
+        total_registrations += reg_count
+        
+        events_with_stats.append({
+            **event.dict(),
+            "registration_count": reg_count,
+            "status": "Active" # Hardcoded for now
+        })
+        
+    return {
+        "stats": {
+            "active": active_count,
+            "pending": pending_count,
+            "total_registrations": total_registrations
+        },
+        "events": events_with_stats
+    }
 
 # --- 2. PUBLIC EVENTS API ---
 from sqlalchemy import func, select, or_, desc, cast, Date
@@ -260,32 +364,23 @@ async def register_for_event(
     if existing:
         return {"status": "ALREADY_REGISTERED", "message": "You are already registered for this event."}
 
-    # 3. Trigger Automation (Run in background or await?)
-    # For better UX, we await it here so user gets immediate result, 
-    # but for production queues are better. We await for MVP validity.
+    # 3. MANUAL CONFIRMATION (API called after user confirms in UI)
     
-    # Split name
-    parts = (current_user.full_name or "Guest User").split(" ")
-    first_name = parts[0]
-    last_name = parts[-1] if len(parts) > 1 else "."
+    # Generate a Self-Verified Confirmation ID
+    import time
+    confirmation_id = f"SELF-{int(time.time())}"
 
-    registration_result = await auto_register_playwright(
-        event.url, 
-        first_name, 
-        last_name, 
-        current_user.email
+    new_reg = UserRegistration(
+        event_id=event_id, 
+        user_email=current_user.email,
+        confirmation_id=confirmation_id,
+        status="SUCCESS"
     )
+    session.add(new_reg)
+    await session.commit()
 
-    if registration_result["status"] == "SUCCESS":
-        # Save to DB
-        new_reg = UserRegistration(
-            event_id=event_id, 
-            user_email=current_user.email,
-            confirmation_id=registration_result["confirmation_id"],
-            status="SUCCESS"
-        )
-        session.add(new_reg)
-        await session.commit()
-        return {"status": "SUCCESS", "message": "Registration successful!", "confirmation_id": registration_result["confirmation_id"]}
-    else:
-        return {"status": "FAILED", "message": registration_result.get("error", "Unknown error")}
+    return {
+        "status": "SUCCESS", 
+        "message": "Registration verified and saved!", 
+        "confirmation_id": confirmation_id
+    }
