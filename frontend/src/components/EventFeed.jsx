@@ -1,10 +1,30 @@
 import { useState } from 'react';
-import { Search, MapPin, Calendar, ExternalLink, ArrowLeft } from 'lucide-react';
+import { Search, MapPin, Calendar, ExternalLink, ArrowLeft, Eye } from 'lucide-react';
+import EventDetailModal from './EventDetailModal';
 
 export default function EventFeed({ events, loading, error, onBack }) {
   const [search, setSearch] = useState("");
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
 
-  const handleRegister = async (event) => {
+  const handleEventClick = (event) => {
+    // Logic: Internal (InfiniteBZ) -> Open Modal | External -> Redirect
+    // Check 'source' OR if the URL is our internal placeholder
+    const isInternal = event.raw_data?.source === 'InfiniteBZ' || event.url?.includes('infinitebz.com');
+
+    if (isInternal) {
+      setSelectedEvent(event);
+      setIsModalOpen(true);
+      // Reset registration state for new view (in a real app, check API if already registered)
+      setIsRegistered(false);
+    } else {
+      // Track external click
+      handleExternalRedirect(event);
+    }
+  };
+
+  const handleExternalRedirect = async (event) => {
     // 1. Track Click
     try {
       await fetch('/api/v1/track-click', {
@@ -19,6 +39,32 @@ export default function EventFeed({ events, loading, error, onBack }) {
 
     // 2. Redirect
     window.open(event.url, '_blank');
+  };
+
+  const handleInternalRegister = async (event) => {
+    try {
+      const res = await fetch(`/api/v1/events/${event.id}/register`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // simple check
+        }
+      });
+
+      if (res.ok) {
+        setIsRegistered(true);
+        // alert("Registered Successfully!"); // integrated into modal UI
+      } else {
+        const data = await res.json();
+        if (data.status === "ALREADY_REGISTERED") {
+          setIsRegistered(true);
+        } else {
+          alert("Registration failed: " + (data.detail || "Unknown error"));
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong with registration.");
+    }
   };
 
   const filtered = events.filter(e =>
@@ -97,18 +143,31 @@ export default function EventFeed({ events, loading, error, onBack }) {
                   </div>
 
                   <button
-                    onClick={() => handleRegister(event)}
+                    onClick={() => handleEventClick(event)}
                     className="w-full bg-primary-600 hover:bg-primary-500 text-white font-medium py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary-500/25 active:scale-95"
                   >
-                    <span>Register Now</span>
-                    <ExternalLink size={16} />
+                    <span>
+                      {(event.raw_data?.source === 'InfiniteBZ' || event.url?.includes('infinitebz.com'))
+                        ? 'View'
+                        : 'Register Now'}
+                    </span>
+                    {(event.raw_data?.source === 'InfiniteBZ' || event.url?.includes('infinitebz.com'))
+                      ? <Eye size={16} />
+                      : <ExternalLink size={16} />}
                   </button>
                 </div>
               </div>
             ))}
           </div>
         )}
+        <EventDetailModal
+          event={selectedEvent}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onRegister={handleInternalRegister}
+          isRegistered={isRegistered}
+        />
       </div>
-    </div>
+    </div >
   )
 }
