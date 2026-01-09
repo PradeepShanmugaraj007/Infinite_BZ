@@ -28,6 +28,9 @@ export default function AuthPage({ onBack, onComplete, initialMode = 'login' }) 
         setOtp('');
         setNewPassword('');
         setConfirmPassword('');
+        // Clear email and password fields when switching modes
+        setEmail('');
+        setPassword('');
     };
 
     const [activeModal, setActiveModal] = useState(null); // 'terms' | 'privacy' | null

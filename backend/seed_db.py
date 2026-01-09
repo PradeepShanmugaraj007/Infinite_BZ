@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 
 # Hardcoded from your config
-DATABASE_URL = "postgresql+asyncpg://postgres:12345@localhost:5432/events_hub"
+DATABASE_URL = "postgresql+asyncpg://postgres:Sankar%40722001@localhost:5432/infinitetechai"
 engine = create_async_engine(DATABASE_URL)
 
 async def seed():

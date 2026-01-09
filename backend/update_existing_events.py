@@ -15,7 +15,7 @@ from sqlalchemy.future import select
 from app.services.scraper import fetch_event_details_api
 from app.models.schemas import Event
 
-DATABASE_URL = "postgresql+asyncpg://postgres:12345@localhost:5432/events_hub"
+DATABASE_URL = "postgresql+asyncpg://postgres:Sankar%40722001@localhost:5432/infinitetechai"
 engine = create_async_engine(DATABASE_URL)
 
 async def update_all_events():

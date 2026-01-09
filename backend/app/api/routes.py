@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from typing import List
+from typing import List, Optional
 
 from app.core.database import get_session
 from app.models.schemas import Event, UserRegistration, EventListResponse, User, EventCreate
 from app.services.scraper import scrape_events_playwright # Async import
 from app.auth import get_current_user
+from sqlmodel import SQLModel
 import uuid
 
 router = APIRouter()
@@ -380,7 +381,95 @@ async def register_for_event(
     await session.commit()
 
     return {
-        "status": "SUCCESS", 
-        "message": "Registration verified and saved!", 
+        "status": "SUCCESS",
+        "message": "Registration verified and saved!",
         "confirmation_id": confirmation_id
+    }
+
+# --- 5. USER PROFILE ENDPOINT ---
+class UserProfileUpdate(SQLModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    job_title: Optional[str] = None
+    company: Optional[str] = None
+    phone: Optional[str] = None
+    bio: Optional[str] = None
+    profile_image: Optional[str] = None
+
+class UserProfileResponse(SQLModel):
+    id: int
+    email: str
+    full_name: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    job_title: Optional[str] = None
+    company: Optional[str] = None
+    phone: Optional[str] = None
+    bio: Optional[str] = None
+    profile_image: Optional[str] = None
+
+@router.get("/user/profile", response_model=UserProfileResponse)
+async def get_user_profile(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get current user's profile information.
+    """
+    return UserProfileResponse(
+        id=current_user.id,
+        email=current_user.email,
+        full_name=current_user.full_name,
+        first_name=current_user.first_name,
+        last_name=current_user.last_name,
+        job_title=current_user.job_title,
+        company=current_user.company,
+        phone=current_user.phone,
+        bio=current_user.bio,
+        profile_image=current_user.profile_image
+    )
+
+@router.put("/user/profile")
+async def update_user_profile(
+    profile_data: UserProfileUpdate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session)
+):
+    """
+    Update current user's profile information.
+    """
+    # Get the user
+    user = await session.get(User, current_user.id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Update fields
+    update_data = profile_data.dict(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(user, field, value)
+
+    # Update full_name based on first_name and last_name
+    if profile_data.first_name is not None or profile_data.last_name is not None:
+        first_name = profile_data.first_name if profile_data.first_name is not None else user.first_name or ""
+        last_name = profile_data.last_name if profile_data.last_name is not None else user.last_name or ""
+        user.full_name = f"{first_name} {last_name}".strip()
+
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+
+    return {
+        "status": "success",
+        "message": "Profile updated successfully",
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "full_name": user.full_name,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "job_title": user.job_title,
+            "company": user.company,
+            "phone": user.phone,
+            "bio": user.bio,
+            "profile_image": user.profile_image
+        }
     }

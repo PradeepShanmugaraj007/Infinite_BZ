@@ -9,7 +9,7 @@ from app.models.schemas import Event
 if sys.platform == 'win32':
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
-DATABASE_URL = "postgresql+asyncpg://postgres:12345@localhost:5432/events_hub"
+DATABASE_URL = "postgresql+asyncpg://postgres:Sankar%40722001@localhost:5432/infinitetechai"
 engine = create_async_engine(DATABASE_URL)
 
 async def verify_data():

@@ -38,7 +38,7 @@ export default function Sidebar({ activePage, onNavigate, onLogout, onCreateClic
                     icon={<Settings size={20} />}
                     label="Settings"
                     active={activePage === 'settings'}
-                    onClick={() => { }}
+                    onClick={() => onNavigate('settings')}
                 />
             </nav>
 

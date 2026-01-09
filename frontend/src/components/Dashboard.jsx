@@ -245,6 +245,7 @@ export default function Dashboard({ user, onLogout, onNavigate }) {
                 onNavigate={(view) => {
                     if (view === 'dashboard') setActiveView('feed');
                     else if (view === 'my-events') setActiveView('my-events');
+                    else if (view === 'settings') onNavigate('settings');
                 }}
                 onLogout={onLogout}
                 onCreateClick={() => onNavigate('create-event')}
@@ -278,9 +279,19 @@ export default function Dashboard({ user, onLogout, onNavigate }) {
                                 <div className="relative">
                                     <button
                                         onClick={() => setShowProfileMenu(!showProfileMenu)}
-                                        className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-slate-900 font-bold hover:ring-2 hover:ring-white/20 transition-all"
+                                        className="w-8 h-8 rounded-full flex items-center justify-center hover:ring-2 hover:ring-white/20 transition-all overflow-hidden"
                                     >
-                                        {user?.full_name?.[0] || 'A'}
+                                        {user?.profile_image ? (
+                                            <img
+                                                src={user.profile_image}
+                                                alt="Profile"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-primary-500 rounded-full flex items-center justify-center text-slate-900 font-bold">
+                                                {user?.full_name?.[0] || 'A'}
+                                            </div>
+                                        )}
                                     </button>
 
                                     {showProfileMenu && (
@@ -295,7 +306,10 @@ export default function Dashboard({ user, onLogout, onNavigate }) {
                                                 <button className="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-2 transition-colors">
                                                     <Users size={16} /> My Profile
                                                 </button>
-                                                <button className="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-2 transition-colors">
+                                                <button
+                                                    onClick={() => onNavigate('settings')}
+                                                    className="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-2 transition-colors"
+                                                >
                                                     <Settings size={16} /> Settings
                                                 </button>
 

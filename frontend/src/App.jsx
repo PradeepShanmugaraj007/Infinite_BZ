@@ -4,6 +4,7 @@ import EventFeed from './components/EventFeed';
 import AuthPage from './components/AuthPage';
 import Dashboard from './components/Dashboard';
 import CreateEventPage from './components/CreateEventPage';
+import SettingsPage from './components/SettingsPage';
 import ErrorBoundary from './components/ErrorBoundary';
 
 export default function App() {
@@ -185,6 +186,16 @@ export default function App() {
               console.error("Create event error", err);
               throw err;
             }
+          }}
+        />
+      )}
+
+      {currentView === 'settings' && (
+        <SettingsPage
+          user={user}
+          onNavigate={(view) => {
+            window.scrollTo(0, 0);
+            setCurrentView(view);
           }}
         />
       )}

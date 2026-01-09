@@ -79,6 +79,15 @@ class UserBase(SQLModel):
     full_name: Optional[str] = None
     is_active: bool = Field(default=True)
 
+    # Profile fields
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    job_title: Optional[str] = None
+    company: Optional[str] = None
+    phone: Optional[str] = None
+    bio: Optional[str] = None
+    profile_image: Optional[str] = None  # For storing image URL or path
+
 class User(UserBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     hashed_password: str

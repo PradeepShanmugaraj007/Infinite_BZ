@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 # Setup DB connection locally since we are not in the app
-DATABASE_URL = "postgresql+asyncpg://postgres:12345@localhost:5432/events_hub"
+DATABASE_URL = "postgresql+asyncpg://postgres:Sankar%40722001@localhost:5432/infinitetechai"
 engine = create_async_engine(DATABASE_URL)
 
 async def force_scrape():

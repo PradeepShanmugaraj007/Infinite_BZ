@@ -2,7 +2,7 @@ import asyncio
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy import text
 
-DATABASE_URL = "postgresql+asyncpg://postgres:12345@localhost:5432/events_hub"
+DATABASE_URL = "postgresql+asyncpg://postgres:Sankar%40722001@localhost:5432/infinitetechai"
 
 async def check_db():
     engine = create_async_engine(DATABASE_URL, echo=False)
