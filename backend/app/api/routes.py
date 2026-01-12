@@ -111,6 +111,85 @@ async def create_event(
 
     return new_event
 
+    return new_event
+
+@router.delete("/events/{event_id}")
+async def delete_event(
+    event_id: int,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session)
+):
+    """
+    Deletes an event given its ID. Only the creator should be able to delete.
+    """
+    # 1. Get Event
+    event = await session.get(Event, event_id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+        
+    # 2. Check Ownership (Simple email check within raw_data)
+    # In a real app, strict relationship check is better.
+    creator_email = event.raw_data.get("created_by") if event.raw_data else None
+    if creator_email != current_user.email:
+         raise HTTPException(status_code=403, detail="Not authorized to delete this event")
+         
+    # 3. Delete
+    await session.delete(event)
+    await session.commit()
+    return {"status": "success", "message": "Event deleted"}
+
+@router.put("/events/{event_id}", response_model=Event)
+async def update_event(
+    event_id: int,
+    event_update: EventCreate, # Re-using schema for simplicity
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session)
+):
+    """
+    Updates an event.
+    """
+    # 1. Get Event
+    event = await session.get(Event, event_id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    # 2. Check Ownership
+    creator_email = event.raw_data.get("created_by") if event.raw_data else None
+    if creator_email != current_user.email:
+         raise HTTPException(status_code=403, detail="Not authorized to update this event")
+
+    # 3. Update Fields
+    # Update main columns
+    event_dict = event_update.dict(exclude_unset=True)
+    
+    # Handle core columns mapping
+    for key, value in event_dict.items():
+        if key not in ["organizer_email", "price", "organizer_name", "agenda", "speakers"] and hasattr(event, key):
+            setattr(event, key, value)
+            
+    # Update raw_data for flexible fields
+    current_raw = event.raw_data.copy() if event.raw_data else {}
+    current_raw.update({
+        "organizer_email": event_update.organizer_email,
+        "price": event_update.price,
+        "capacity": event_update.capacity,
+        "agenda": event_update.agenda,
+        "speakers": event_update.speakers
+    })
+    event.raw_data = current_raw
+    
+    # Update special fields
+    if event_update.organizer_name:
+        event.organizer_name = event_update.organizer_name
+        
+    # Recalculate derived fields if needed (e.g. venue_name from mode)
+    # For now assuming frontend sends correct venue_name/address via payload
+    
+    session.add(event)
+    await session.commit()
+    await session.refresh(event)
+    return event
+
 @router.get("/events/my-events")
 async def get_my_events(
     current_user: User = Depends(get_current_user),

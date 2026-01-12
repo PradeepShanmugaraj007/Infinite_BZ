@@ -453,9 +453,9 @@ export default function Dashboard({ user, onLogout, onNavigate }) {
                             <div className="grid grid-cols-12 gap-4 px-6 mb-4 text-xs font-bold text-slate-400 uppercase tracking-wider">
                                 <div className="col-span-1">Date</div>
                                 <div className="col-span-5">Event Details</div>
-                                <div className="col-span-3">Location</div>
+                                <div className="col-span-2">Location</div>
                                 <div className="col-span-2">Source</div>
-                                <div className="col-span-1 text-right">Action</div>
+                                <div className="col-span-2 text-right">Action</div>
                             </div>
 
                             {/* EVENTS LIST */}
@@ -693,8 +693,8 @@ function EventCard({ event, onRegister, isRegistered }) {
                 </p>
             </div>
 
-            {/* Location - col-span-3 */}
-            <div className="col-span-3 text-xs text-slate-500 hidden md:block">
+            {/* Location - col-span-2 */}
+            <div className="col-span-2 text-xs text-slate-500 hidden md:block">
                 <p className="font-semibold text-slate-300 truncate mb-0.5">
                     {event.venue_name || (event.online_event ? "Online Event" : "TBD")}
                 </p>
@@ -715,16 +715,16 @@ function EventCard({ event, onRegister, isRegistered }) {
                 </span>
             </div>
 
-            {/* Action - col-span-1 */}
-            <div className="col-span-1 text-right">
+            {/* Action - col-span-2 */}
+            <div className="col-span-2 text-right">
                 <button
                     onClick={handleClick}
                     disabled={registering || isRegistered}
-                    className={`w-full py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${isRegistered
-                        ? 'bg-green-500 text-white cursor-default'
+                    className={`w-32 py-2.5 rounded-lg uppercase tracking-wider font-bold transition-all inline-flex items-center justify-center gap-2 ${isRegistered
+                        ? 'bg-green-500 text-white cursor-default text-[10px]'
                         : registering
-                            ? 'bg-slate-700 text-slate-400 cursor-wait'
-                            : 'bg-primary-500 hover:bg-primary-400 text-slate-900 shadow-lg shadow-primary-500/20'
+                            ? 'bg-slate-700 text-slate-400 cursor-wait text-xs'
+                            : 'bg-primary-500 hover:bg-primary-400 text-slate-900 shadow-lg shadow-primary-500/20 text-xs'
                         }`}
                 >
                     {event.raw_data?.source === 'InfiniteBZ'

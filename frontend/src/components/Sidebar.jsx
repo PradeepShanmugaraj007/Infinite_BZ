@@ -1,4 +1,4 @@
-import { LayoutDashboard, ClipboardList, TrendingUp, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, TrendingUp, Settings, LogOut, Plus } from 'lucide-react';
 
 export default function Sidebar({ activePage, onNavigate, onLogout, onCreateClick }) {
     return (
@@ -45,9 +45,10 @@ export default function Sidebar({ activePage, onNavigate, onLogout, onCreateClic
             <div className="p-4">
                 <button
                     onClick={onCreateClick}
-                    className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-slate-900 rounded-xl font-bold transition-all shadow-lg shadow-primary-500/30 flex items-center justify-center gap-2"
+                    className="w-full py-3.5 bg-gradient-to-r from-primary-500 to-indigo-600 hover:from-primary-400 hover:to-indigo-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary-500/25 flex items-center justify-center gap-2 transform hover:scale-[1.02] active:scale-[0.98] group"
                 >
-                    + Create Event
+                    <Plus size={18} className="text-white group-hover:rotate-90 transition-transform duration-300" />
+                    <span className="text-xs uppercase tracking-wider font-bold">Create Event</span>
                 </button>
                 <button onClick={onLogout} className="flex items-center gap-3 px-4 py-3 w-full text-white/70 hover:text-white mt-4 transition-colors rounded-lg hover:bg-white/5">
                     <LogOut size={18} />
