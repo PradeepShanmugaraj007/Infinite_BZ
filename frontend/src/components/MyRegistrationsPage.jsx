@@ -6,6 +6,7 @@ export default function MyRegistrationsPage({ onNavigate, user }) {
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchUserRegistrations();
@@ -49,6 +50,28 @@ export default function MyRegistrationsPage({ onNavigate, user }) {
     });
   };
 
+  const getFilteredRegistrations = () => {
+    const now = new Date();
+    return registrations.filter(event => {
+      // First check tab filter
+      const eventDate = new Date(event.start_time);
+      let tabMatch = false;
+      if (activeTab === 'going') {
+        tabMatch = eventDate > now;
+      } else if (activeTab === 'past') {
+        tabMatch = eventDate < now;
+      } else {
+        // For 'saved' or other tabs, show all
+        tabMatch = true;
+      }
+
+      // Then check search filter
+      const searchMatch = searchTerm === '' || event.title.toLowerCase().includes(searchTerm.toLowerCase());
+
+      return tabMatch && searchMatch;
+    });
+  };
+
   return (
     <div className="min-h-screen bg-slate-900">
       {/* Header */}
@@ -60,17 +83,11 @@ export default function MyRegistrationsPage({ onNavigate, user }) {
               <input
                 type="text"
                 placeholder="Search events..."
-                className="bg-transparent outline-none flex-1"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="bg-white text-gray-800 outline-none flex-1 rounded-full px-2 py-1"
               />
             </div>
-            <div className="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2">
-              <MapPin size={18} className="text-gray-600" />
-              <span>Chennai, IN</span>
-              <span className="text-gray-400">×</span>
-            </div>
-            <button className="bg-gray-800 text-white rounded-full p-2">
-              🔍
-            </button>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm font-semibold">30% off</span>
@@ -175,21 +192,27 @@ export default function MyRegistrationsPage({ onNavigate, user }) {
                 Try Again
               </button>
             </div>
-          ) : registrations.length === 0 ? (
+          ) : getFilteredRegistrations().length === 0 ? (
             <div className="text-center py-10 text-slate-500">
               <Calendar size={48} className="mx-auto mb-4 text-slate-600" />
-              <h3 className="text-xl font-bold text-white mb-2">No registrations yet</h3>
-              <p className="text-slate-400 mb-4">You haven't registered for any events yet.</p>
-              <button
-                onClick={onNavigate}
-                className="px-6 py-3 bg-primary-500 text-slate-900 rounded-lg font-bold hover:bg-primary-600 transition-colors"
-              >
-                Browse Events
-              </button>
+              <h3 className="text-xl font-bold text-white mb-2">
+                {activeTab === 'going' ? 'No upcoming events' : activeTab === 'past' ? 'No past events' : 'No registrations yet'}
+              </h3>
+              <p className="text-slate-400 mb-4">
+                {activeTab === 'going' ? 'You have no upcoming registered events.' : activeTab === 'past' ? 'You have no past registered events.' : "You haven't registered for any events yet."}
+              </p>
+              {activeTab !== 'going' && activeTab !== 'past' && (
+                <button
+                  onClick={onNavigate}
+                  className="px-6 py-3 bg-primary-500 text-slate-900 rounded-lg font-bold hover:bg-primary-600 transition-colors"
+                >
+                  Browse Events
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {registrations.map((event, index) => (
+              {getFilteredRegistrations().map((event, index) => (
                 <div key={event.id || index} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition">
                   <div className="relative h-32 bg-gradient-to-r from-primary-500 to-indigo-600 flex items-center justify-center">
                     <div className="absolute top-2 left-2 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">

@@ -729,7 +729,11 @@ function EventCard({ event, onRegister, isRegistered }) {
                 >
                     {event.raw_data?.source === 'InfiniteBZ'
                         ? (
-                            <> <span>Register</span> <Eye size={14} /> </>
+                            isRegistered ? (
+                                <> <span>Registered</span> <CheckCircle2 size={14} /> </>
+                            ) : (
+                                <> <span>Register</span> <Eye size={14} /> </>
+                            )
                         )
                         : (registering ? 'Processing...' : isRegistered ? 'Registered' : 'Register')
                     }
