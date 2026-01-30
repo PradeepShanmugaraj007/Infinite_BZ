@@ -379,9 +379,34 @@ async def list_events(
         
     # 3. Source Filter (Platform)
     if source and source.strip().lower() != "all":
-        # Check URL for the source name (e.g. 'eventbrite', 'meetup')
-        filter_query = filter_query.where(Event.url.ilike(f"%{source.strip()}%"))
-        # Add more sources here if needed
+        s_val = source.strip().lower()
+        
+        # Mapping for UI friendly names
+        if s_val == "ctc" or s_val == "trade centre":
+            s_val = "trade_centre" 
+        elif s_val == "allevents":
+            s_val = "allevents"
+            
+        # Check source in raw_data OR url
+        # Use simple URL check first for speed, then raw_data
+        # Note: raw_data->>'source' comparison needs casting or explicit containment
+        from sqlalchemy import cast, String
+        
+        # Flexible filter: URL contains string OR raw_data['source'] equals string
+        # Since 'trade_centre' is in raw_data, but URL is chennaitradecentre.org
+        
+        source_conditions = []
+        source_conditions.append(Event.url.ilike(f"%{s_val}%"))
+        
+        # Explicit raw_data check using astext (safer than cast)
+        # Event.raw_data['source'].astext gives the unquoted string value
+        source_conditions.append(Event.raw_data['source'].astext == s_val)
+        
+        # Special case for mapped CTC (also match the URL host)
+        if s_val == "trade_centre":
+             source_conditions.append(Event.url.ilike("%chennaitradecentre%"))
+
+        filter_query = filter_query.where(or_(*source_conditions))
         
     # 4. Cost Filter
     if is_free:
@@ -450,7 +475,20 @@ async def list_events(
         count_stmt = count_stmt.where(or_(*conditions))
         
     if source and source.strip().lower() != "all":
-        count_stmt = count_stmt.where(Event.url.ilike(f"%{source.strip()}%"))
+        s_val = source.strip().lower()
+        if s_val == "ctc" or s_val == "trade centre":
+            s_val = "trade_centre" 
+        elif s_val == "allevents":
+            s_val = "allevents"
+            
+        source_conditions = []
+        source_conditions.append(Event.url.ilike(f"%{s_val}%"))
+        source_conditions.append(Event.raw_data['source'].astext == s_val)
+        
+        if s_val == "trade_centre":
+             source_conditions.append(Event.url.ilike("%chennaitradecentre%"))
+             
+        count_stmt = count_stmt.where(or_(*source_conditions))
 
     if is_free:
         if is_free.lower() == "free":

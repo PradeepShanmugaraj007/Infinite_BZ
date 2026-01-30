@@ -548,7 +548,7 @@ export default function Dashboard({ user, onLogout, onNavigate, initialView, ini
                                 />
                                 <FilterDropdown
                                     label="Source"
-                                    options={["All", "Eventbrite", "Meetup", "InfiniteBZ"]}
+                                    options={["All", "Eventbrite", "Meetup", "AllEvents", "Trade Centre", "InfiniteBZ"]}
                                     selected={selectedSource}
                                     onChange={setSelectedSource}
                                 />
