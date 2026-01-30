@@ -11,6 +11,7 @@ import MyEvents from './MyEvents';
 import MyRegistrationsPage from './MyRegistrationsPage';
 import NotificationsPage from './NotificationsPage';
 import Sidebar from './Sidebar';
+import EventTicketPage from './EventTicketPage';
 
 export default function Dashboard({ user, onLogout, onNavigate }) {
     const [stats, setStats] = useState({
@@ -395,6 +396,12 @@ export default function Dashboard({ user, onLogout, onNavigate }) {
                     <MyRegistrationsPage onNavigate={() => setActiveView('feed')} user={user} />
                 ) : activeView === 'notifications' ? (
                     <NotificationsPage notifications={userActivities} />
+                ) : activeView === 'ticket' ? (
+                    <EventTicketPage
+                        event={selectedInternalEvent}
+                        user={user}
+                        onBack={() => setActiveView('my-registrations')}
+                    />
                 ) : (
                     <>
                         {/* Header */}
