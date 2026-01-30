@@ -131,6 +131,7 @@ async def scrape_events_playwright(city: str = "chennai", category: str = "busin
     to fetch accurate details for each event.
     """
     cleaned_events = []
+    seen_ids = set()
     
     # Construct Search URL
     encoded_city = urllib.parse.quote(city)
@@ -184,6 +185,10 @@ async def scrape_events_playwright(city: str = "chennai", category: str = "busin
                     
                     if not event_id or event_id == "unknown":
                          continue 
+
+                    if event_id in seen_ids:
+                        continue
+                    seen_ids.add(event_id) 
                     
                     
                     # --- NEW: Extract Card Image (Aggressively) ---

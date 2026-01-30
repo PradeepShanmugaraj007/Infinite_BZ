@@ -9,6 +9,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.utils import ImageReader
 import tempfile
+from urllib.parse import quote
 
 load_dotenv() # Load variables from .env file
 
@@ -80,7 +81,7 @@ async def send_reset_email(email: EmailStr, otp: str):
         print(f"EXTREME ERROR: Failed to send email via SMTP: {e}")
         return False
 
-async def send_ticket_email(email: EmailStr, name: str, event_title: str, event_id: int):
+async def send_ticket_email(email: EmailStr, name: str, event_title: str, event_id: int, ticket_id: str = ""):
     """
     Sends the Ticket Email via Real SMTP using fastapi-mail.
     """
@@ -99,7 +100,7 @@ async def send_ticket_email(email: EmailStr, name: str, event_title: str, event_
                     <p>Thank you for registering! We are excited to see you.</p>
                     <br/>
                     <div style="text-align: center;">
-                        <a href="http://localhost:5174/?view=ticket-details&eventId={event_id}&email={email}" style="background-color: #38BDF8; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; border-radius: 5px;">Go to Ticket</a>
+                        <a href="http://localhost:5174/?view=ticket-details&eventId={event_id}&email={email}&ticketId={ticket_id}&eventName={quote(event_title)}" style="background-color: #38BDF8; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; border-radius: 5px;">Go to Ticket</a>
                     </div>
                     <br/>
                     <p style="font-size: 12px; color: #888;">Powered by Infinite BZ Event Platform</p>
@@ -369,7 +370,7 @@ async def send_event_ticket_email(email: EmailStr, event_data: dict, confirmatio
                         <img src="data:image/png;base64,{qr_base64}" alt="QR Code" style="max-width: 200px;" />
                         <br/>
                         <div style="text-align: center; margin-top: 20px;">
-                            <a href="http://localhost:5174/?view=ticket-details&eventId={event_data.get('id', '')}&email={email}" style="background-color: #38BDF8; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; border-radius: 5px;">Go to Ticket</a>
+                            <a href="http://localhost:5174/?view=ticket-details&eventId={event_data.get('id', '')}&email={email}&ticketId={ticket_id_to_use}&eventName={quote(event_data.get('title', ''))}" style="background-color: #38BDF8; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; border-radius: 5px;">Go to Ticket</a>
                         </div>
                         <p style="font-size: 12px; color: #888;">Please bring this to the event.</p>
                     </div>

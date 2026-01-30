@@ -98,6 +98,12 @@ export default function App() {
             setInitialDashboardView(null);
             setInitialDashboardEventId(null);
 
+            // Clean URL
+            if (window.history.pushState) {
+              const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+              window.history.pushState({ path: newUrl }, '', newUrl);
+            }
+
             localStorage.removeItem('token');
             setUser(null);
             setAuthMode('login');

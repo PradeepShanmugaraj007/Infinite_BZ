@@ -419,6 +419,22 @@ export default function Dashboard({ user, onLogout, onNavigate, initialView, ini
                         eventId={selectedInternalEvent?.id}
                         user={user}
                         onNavigate={(view) => setActiveView(view)}
+                        onCancelSuccess={() => {
+                            // Remove from local state immediately
+                            if (selectedInternalEvent?.id) {
+                                setNewlyRegisteredIds(prev => prev.filter(id => id !== selectedInternalEvent.id));
+                                setUserRegistrationCount(prev => Math.max(0, prev - 1));
+                            }
+
+                            // Clear deep link params from URL without reloading
+                            if (window.history.pushState) {
+                                const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                                window.history.pushState({ path: newUrl }, '', newUrl);
+                            }
+
+                            // Navigate back to feed
+                            setActiveView('feed');
+                        }}
                     />
                 ) : (
                     <>

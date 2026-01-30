@@ -52,6 +52,31 @@ export default function EventTicketPage({ eventId, onNavigate, onCancelSuccess, 
         }
     };
 
+    // Strict Validation Effect
+    useEffect(() => {
+        if (eventData && ticketId) {
+            const params = new URLSearchParams(window.location.search);
+            const urlTicketId = params.get('ticketId');
+            const urlEventName = params.get('eventName');
+
+            if (urlTicketId && urlTicketId !== ticketId) {
+                alert(`Security Alert: The Ticket ID in the link (${urlTicketId}) does not match your ticket (${ticketId}). Access Denied.`);
+                onNavigate('feed');
+                return;
+            }
+
+            if (urlEventName && eventData.title) {
+                // Handle potential encoding differences
+                const decodedUrlName = decodeURIComponent(urlEventName);
+                if (decodedUrlName !== eventData.title && urlEventName !== eventData.title) {
+                    alert(`Security Alert: The Event Name in the link does not match. Access Denied.`);
+                    onNavigate('feed');
+                    return;
+                }
+            }
+        }
+    }, [eventData, ticketId]);
+
     const downloadQR = async () => {
         try {
             const token = localStorage.getItem('token');

@@ -34,9 +34,15 @@ async def sync_events(city: str = "chennai", session: AsyncSession = Depends(get
         raise HTTPException(status_code=500, detail=str(e))
     
     saved_count = 0
+    processed_ids = set()
     for data in events_data:
+        evt_id = data["eventbrite_id"]
+        if evt_id in processed_ids:
+             continue
+        processed_ids.add(evt_id)
+
         # Check duplicates via eventbrite_id
-        stmt = select(Event).where(Event.eventbrite_id == data["eventbrite_id"])
+        stmt = select(Event).where(Event.eventbrite_id == evt_id)
         result = await session.execute(stmt)
         existing = result.scalars().first()
         
@@ -674,7 +680,8 @@ async def register_for_event(
                 email=current_user.email,
                 name=current_user.full_name or "Attendee",
                 event_title=event.title,
-                event_id=event.id
+                event_id=event.id,
+                ticket_id=confirmation_id
             )
 
             # 3. Send Notification Email to Organizer/Sender (BACKGROUND TASK)
