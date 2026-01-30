@@ -12,7 +12,7 @@
 ### 🏢 Exclusive Business Focus
 *   **Strict Filtering**: Automatically filters out non-business events (Music, Sports, Comedy, etc.).
 *   **Curated Sources**: Aggregates high-quality events from:
-    *   **Chennai Trade Centre (CTC)**: Major expos and trade summits.
+    *   **Trade Centre (CTC)**: Major expos and trade summits.
     *   **AllEvents**: Business & Professional workshops only.
     *   **Meetup**: Tech and startup community gatherings.
     *   **Eventbrite**: Corporate seminars and conferences.
@@ -70,6 +70,11 @@
     playwright install
     ```
 4.  Configure `.env` file (see Configuration section).
+5.  Run the server:
+    ```bash
+    python run.py
+    ```
+    *Server runs at: http://localhost:8000*
 
 ### 2. Frontend Setup
 1.  Navigate to the frontend directory:
@@ -80,6 +85,11 @@
     ```bash
     npm install
     ```
+3.  Run the development server:
+    ```bash
+    npm run dev
+    ```
+    *App runs at: http://localhost:5173* (or 5174)
 
 ---
 
@@ -108,29 +118,11 @@ ALGORITHM=HS256
 
 ---
 
-## ▶️ Running the Application
-
-**Terminal 1 (Backend):**
-```bash
-cd backend
-python run.py
-```
-*Server runs at: http://localhost:8000*
-
-**Terminal 2 (Frontend):**
-```bash
-cd frontend
-npm run dev
-```
-*App runs at: http://localhost:5174*
-
----
-
 ## 🕷️ Scraping System
 The scraper is designed to be **robust and self-healing**:
 *   **`robust_scrape.py`**: Runs scrapers sequentially (AllEvents -> Meetup -> CTC -> Eventbrite).
 *   **Business Filter**: A global strict filter ensures zero "junk" events enter the DB.
-*   **Image Optimization**: Uses high-quality banners where available, falls back to Unsplash for generic placeholders.
+*   **Source Mapping**: Intellegently maps "Trade Centre" and "AllEvents" to unified backend sources.
 
 ---
 

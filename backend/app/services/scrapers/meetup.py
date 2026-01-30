@@ -134,8 +134,8 @@ class MeetupScraper(BaseScraper):
                         "eventbrite_id": f"meetup_{event_id}",
                         "title": title[:100], # Truncate if too long
                         "description": f"Join this meetup: {event_url}",
-                        "start_time": start_time,
-                        "end_time": start_time + timedelta(hours=2),
+                        "start_time": start_time.replace(tzinfo=None) if start_time else None,
+                        "end_time": (start_time + timedelta(hours=2)).replace(tzinfo=None) if start_time else None,
                         "url": event_url if "http" in event_url else f"https://www.meetup.com{event_url}",
                         "image_url": event_image, 
                         "venue_name": "Check Event Link",
