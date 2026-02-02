@@ -8,17 +8,75 @@ export default function Step6_Review({ formData, updateFormData, onSave, onBack 
     const handlePublish = async () => {
         setPublishing(true);
 
-        // Trigger confetti
-        confetti({
-            particleCount: 150,
-            spread: 70,
-            origin: { y: 0.6 }
-        });
+        try {
+            // 1. Prepare Payload matching Backend Schema (EventCreate)
+            // Combine Date & Time
+            const startDateTime = new Date(`${formData.startDate}T${formData.startTime}:00`);
+            const endDateTime = new Date(`${formData.endDate || formData.startDate}T${formData.endTime}:00`);
 
-        // Simulate network delay or just call save
-        await onSave(formData);
+            const payload = {
+                title: formData.title,
+                description: formData.description,
+                // Send as naive ISO string (strip Z) to avoid "offset-naive vs offset-aware" DB errors
+                start_time: startDateTime.toISOString().replace('Z', ''),
+                end_time: endDateTime.toISOString().replace('Z', ''),
+                venue_name: formData.mode === 'offline' ? formData.location : "Online Event",
+                venue_address: formData.mode === 'offline' ? formData.location : "Online",
+                image_url: formData.imageUrl,
+                category: formData.category,
+                is_free: formData.tickets.every(t => t.price === 0), // Calculate based on tickets
+                online_event: formData.mode === 'online',
+                capacity: 100, // Default or add to form
+                meeting_link: formData.meetingLink,
+                meeting_link_private: formData.meetingLinkPrivate,
+                timezone: formData.timezone,
+                organizer_name: "Host", // Fallback
 
-        setPublishing(false);
+                // Nested JSON fields
+                agenda: formData.agendaItems,
+                speakers: formData.speakers,
+
+                // Map tickets to TicketClassCreate schema
+                tickets: formData.tickets.map(t => ({
+                    name: t.name,
+                    type: t.price > 0 ? "paid" : "free",
+                    price: parseFloat(t.price),
+                    quantity: parseInt(t.quantity),
+                    description: t.description || "",
+                    min_quantity: 1,
+                    max_quantity: 10
+                })),
+
+                // NEW: Pass extra fields in a raw_data wrapper if backend supports it, 
+                // but checking schema, we don't see 'raw_data' in EventCreate, only in Event.
+                // However, often extra fields are ignored or caused 422. 
+                // We will strictly send only what is allowed.
+                // If we want to save tags, we might need to put them in description or separate field if supported.
+                // For now, let's append tags to description if possible or just ignore to fix 422.
+            };
+
+            // Hack: Append tags to description for now as backend has no tags field
+            if (formData.tags && formData.tags.length > 0) {
+                payload.description = (payload.description || "") + "\n\nTags: " + formData.tags.map(t => `#${t}`).join(" ");
+            }
+
+            // Trigger confetti
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
+            // Call save with formatted payload
+            await onSave(payload);
+
+        } catch (error) {
+            console.error("Publishing preparation failed:", error);
+            // Alert is handled by parent or verify generic error
+            alert("Failed to prepare event data. Please check dates and times.");
+        } finally {
+            setPublishing(false);
+        }
     };
 
     const calculateDuration = () => {
