@@ -73,7 +73,9 @@ async def get_registration_qr(
     return {
         "qr_code": qr_base64,
         "event_title": event.title,
-        "ticket_id": registration.confirmation_id
+        "ticket_id": registration.confirmation_id,
+        "payment_id": registration.raw_data.get("payment_id"),
+        "amount_paid": registration.raw_data.get("total_amount", 0)
     }
 
 # --- CHECK-IN ENDPOINT ---

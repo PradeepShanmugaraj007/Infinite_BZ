@@ -174,3 +174,41 @@ def verify_payment(data: PaymentVerify):
         
     except razorpay.errors.SignatureVerificationError:
         raise HTTPException(status_code=400, detail="Payment Verification Failed")
+
+@router.post("/payment/refund-order")
+def refund_order(payment_id: str, amount: float):
+    """
+    Refunds a specific payment.
+    - payment_id: The ID you saved when they paid (e.g., pay_Kj873...)
+    - amount: Amount in Rupees (e.g., 100.0)
+    """
+    try:
+        # 1. Convert to Paise
+        amount_paise = int(amount * 100)
+        
+        # 2. Prepare Refund Data
+        # refund_data = {
+        #     "payment_id": payment_id,
+        #     "amount": amount_paise,
+        #     "speed": "normal",  # 'optimum' or 'normal'
+        #     "notes": {
+        #         "reason": "User requested cancellation"
+        #     }
+        # } # Not used directly in client.payment.refund
+
+        # 3. CRITICAL CHECK: "Route" vs "Normal" Refund
+        # If you used 'Route' (Split), we must reverse the transfer first.
+        # But since you are currently in "Bypass Mode" (taking 100% money),
+        # a standard refund works perfectly.
+        
+        refund = client.payment.refund(payment_id, amount_paise)
+        
+        print(f"✅ Refund Successful: {refund['id']}")
+        return {"status": "success", "refund_id": refund['id']}
+
+    except Exception as e:
+        print(f"❌ Refund Failed: {str(e)}")
+        # Common Error: "The payment has not been captured" (Wait a few mins)
+        # Common Error: "Insufficient Balance" (You must have money in Razorpay)
+        raise HTTPException(status_code=400, detail=f"Refund Failed: {str(e)}")
+

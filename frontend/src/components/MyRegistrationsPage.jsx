@@ -25,7 +25,11 @@ export default function MyRegistrationsPage({ onNavigate, user }) {
         const data = await res.json();
         setRegistrations(data.registrations || []);
       } else {
-        setError('Failed to load registrations');
+        if (res.status === 401) {
+          setError('Session expired. Please log out and sign in again.');
+        } else {
+          setError('Failed to load registrations');
+        }
       }
     } catch (err) {
       console.error('Error fetching registrations:', err);
