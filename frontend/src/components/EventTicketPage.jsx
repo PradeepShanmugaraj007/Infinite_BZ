@@ -4,6 +4,8 @@ export default function EventTicketPage({ eventId, onNavigate, onCancelSuccess, 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [eventData, setEventData] = useState(null);
     const [qrCode, setQrCode] = useState(null);
+    const [paymentId, setPaymentId] = useState(null);
+    const [paidAmount, setPaidAmount] = useState(0);
     const [ticketId, setTicketId] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -41,6 +43,8 @@ export default function EventTicketPage({ eventId, onNavigate, onCancelSuccess, 
                 const data = await res.json();
                 setQrCode(data.qr_code);
                 setTicketId(data.confirmation_id);
+                setPaymentId(data.payment_id);
+                setPaidAmount(data.amount_paid);
             } else {
                 if (res.status === 403 || res.status === 404) {
                     alert("You cancelled the order");
@@ -111,12 +115,34 @@ export default function EventTicketPage({ eventId, onNavigate, onCancelSuccess, 
     };
 
     const cancelOrder = async () => {
-        if (!window.confirm('Are you sure you want to cancel your registration for this event?')) {
+        const confirmMsg = paidAmount > 0
+            ? `Are you sure you want to cancel your registration? A refund of ₹${paidAmount} will be initiated (5-7 business days).`
+            : 'Are you sure you want to cancel your registration for this event?';
+
+        if (!window.confirm(confirmMsg)) {
             return;
         }
 
         try {
             const token = localStorage.getItem('token');
+
+            // 1. Refund Logic
+            if (paymentId && paidAmount > 0) {
+                const refundRes = await fetch(`/api/v1/payment/refund-order?payment_id=${paymentId}&amount=${paidAmount}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!refundRes.ok) {
+                    const err = await refundRes.json();
+                    alert("Refund Failed: " + (err.detail || "Unknown Error"));
+                    return;
+                }
+                const refundData = await refundRes.json();
+                alert("Refund Initiated! Refund ID: " + refundData.refund_id);
+            }
+
+            // 2. Cancellation Logic
             const response = await fetch(`/api/v1/user/registrations/${eventId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }

@@ -14,8 +14,8 @@
 *   **Curated Sources**: Aggregates high-quality events from:
     *   **Trade Centre (CTC)**: Major expos and trade summits.
     *   **AllEvents**: Business & Professional workshops only.
-    *   **Meetup**: Tech and startup community gatherings.
-    *   **Eventbrite**: Corporate seminars and conferences.
+    *   **Meetup**: Tech and startup community gatherings (Official Swarm Logo).
+    *   **Eventbrite**: Corporate seminars and conferences (Official Symbol).
 
 ### 🤖 Smart Technology
 *   **AI Event Wizard**: "Magic Build" mode using **Groq** to auto-generate agendas, speakers, and tags.
@@ -28,7 +28,9 @@
 *   **Unified Registration**: Register for events directly or get redirected to official sources.
 *   **PDF Tickets**: Automated generation of professional QR-coded tickets.
 *   **Email Confirmations**: Instant booking confirmations via SMTP.
-*   **Razorpay Integration**: Verified bank settlements + Secure payment lifecycle for paid tickets.
+*   **Razorpay Integration**: 
+    *   **Secure Payments**: Verified bank settlements for paid tickets.
+    *   **Automated Refunds**: User-initiated cancellations trigger instant refunds (5-7 day settlement) via Razorpay API.
 *   **Location Services**: Integrated "View on Map" redirect for seamless venue navigation.
 
 ---

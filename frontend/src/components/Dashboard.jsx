@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
     LayoutDashboard, Users, Calendar, Settings, LogOut,
     TrendingUp, AlertCircle, CheckCircle2, MoreHorizontal,
-    Search, Bell, Plus, Download, MessageSquare, ClipboardList, X, Eye, UserPlus, UserMinus, Trash2, MessageCircle, RefreshCw
+    Search, Bell, Plus, Download, MessageSquare, ClipboardList, X, Eye, UserPlus, UserMinus, Trash2, MessageCircle, RefreshCw, Infinity, Building2
 } from 'lucide-react';
 import CityDropdown from './CityDropdown';
 import CreateEventModal from './create-event/CreateEventModal';
@@ -1060,48 +1060,7 @@ function EventCard({ event, onRegister, isRegistered, user, onNavigate }) {
                 {/* Source */}
                 <div className="flex items-center justify-between mb-4 mt-auto">
                     <div className="flex items-center gap-2">
-                        {(() => {
-                            const source = event.raw_data?.source || "eventbrite";
-                            const sourceLower = source.toLowerCase();
-
-                            let label = "EB";
-                            let fullName = "Eventbrite";
-                            let colorClass = "bg-orange-500";
-                            let textColor = "text-orange-400";
-
-                            if (sourceLower === 'infinitebz') {
-                                label = "IB";
-                                fullName = "InfiniteBZ";
-                                colorClass = "bg-primary-500";
-                                textColor = "text-primary-400";
-                            } else if (sourceLower === 'meetup') {
-                                label = "M";
-                                fullName = "Meetup";
-                                colorClass = "bg-red-500";
-                                textColor = "text-red-400";
-                            } else if (sourceLower === 'trade_centre' || sourceLower === 'ctc') {
-                                label = "CTC";
-                                fullName = "Trade Centre";
-                                colorClass = "bg-blue-500";
-                                textColor = "text-blue-400";
-                            } else if (sourceLower === 'allevents') {
-                                label = "AE";
-                                fullName = "AllEvents";
-                                colorClass = "bg-yellow-500";
-                                textColor = "text-yellow-400";
-                            }
-
-                            return (
-                                <>
-                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${colorClass}`}>
-                                        {label}
-                                    </div>
-                                    <span className={`text-xs font-medium ${textColor}`}>
-                                        {fullName}
-                                    </span>
-                                </>
-                            );
-                        })()}
+                        <EventSourceBadge source={event.raw_data?.source} />
                     </div>
                 </div>
 
@@ -1133,6 +1092,70 @@ function EventCard({ event, onRegister, isRegistered, user, onNavigate }) {
         </div >
     );
 }
+
+function EventSourceBadge({ source }) {
+    const sourceLower = (source || "eventbrite").toLowerCase();
+
+    let label, fullName, colorClass, textColor;
+
+    if (sourceLower === 'infinitebz') {
+        label = <Infinity size={14} strokeWidth={3} className="text-white" />;
+        fullName = "InfiniteBZ";
+        colorClass = "bg-primary-500";
+        textColor = "text-primary-400";
+    } else if (sourceLower === 'meetup') {
+        // Meetup - User requested "M" and "Yellow"
+        // Using yellow border/text and explicit "M"
+        label = (
+            <span className="text-[#FFD700] font-bold text-sm" style={{ fontFamily: 'sans-serif' }}>M</span>
+        );
+        fullName = "Meetup";
+        colorClass = "bg-white border border-[#FFD700]";
+        textColor = "text-[#FFD700]";
+    } else if (sourceLower === 'trade_centre' || sourceLower === 'ctc') {
+        // CTC Brown/Rust #A52A2A - Box Logo Style
+        label = (
+            <div className="flex items-center justify-center w-full h-full bg-[#A52A2A] text-white text-[8px] font-bold leading-none" style={{ fontFamily: 'serif' }}>
+                TN
+            </div>
+        );
+        fullName = "Trade Centre";
+        colorClass = "bg-white border border-[#A52A2A]";
+        textColor = "text-[#A52A2A]";
+    } else if (sourceLower === 'allevents') {
+        // AllEvents Cyan #30C5DA - Hexagon 'ae'
+        label = (
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-[#30C5DA]">
+                <path d="M12 2l8.66 5v10L12 22l-8.66-5V7L12 2z" fill="none" stroke="currentColor" strokeWidth="2.5" />
+                <text x="12" y="16" textAnchor="middle" fontSize="11" fill="currentColor" fontWeight="bold" style={{ fontFamily: 'sans-serif' }}>ae</text>
+            </svg>
+        );
+        fullName = "AllEvents";
+        colorClass = "bg-white border border-[#30C5DA]";
+        textColor = "text-[#30C5DA]";
+    } else {
+        // Eventbrite Orange #F05537 - "𝓔"
+        label = (
+            <span className="text-[#F05537] font-bold text-sm" style={{ fontFamily: 'serif' }}>𝓔</span>
+        );
+        fullName = "Eventbrite";
+        colorClass = "bg-white border border-[#F05537]";
+        textColor = "text-[#F05537]";
+    }
+
+    return (
+        <>
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white overflow-hidden ${colorClass}`}>
+                {label}
+            </div>
+            <span className={`text-xs font-medium ${textColor}`}>
+                {fullName}
+            </span>
+        </>
+    );
+}
+
+function OldCodeRemoved() { return null; }
 
 function NotificationDropdown() {
     const [isOpen, setIsOpen] = useState(false);
