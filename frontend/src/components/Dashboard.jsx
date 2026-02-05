@@ -198,8 +198,11 @@ export default function Dashboard({ user, onLogout, onNavigate, initialView, ini
                 // ROBUST HANDLING: Check if array or object
                 if (data && Array.isArray(data.data)) {
                     // BACKEND UPGRADE: API now returns { data, total, page, limit }
+                    // FRONTEND DEDUPLICATION: Remove duplicates by title
+                    const uniqueEvents = Array.from(new Map(data.data.map(item => [item.title, item])).values());
+
                     setEventsData({
-                        data: data.data,
+                        data: uniqueEvents,
                         total: data.total,
                         page: data.page,
                         limit: data.limit
@@ -470,6 +473,15 @@ export default function Dashboard({ user, onLogout, onNavigate, initialView, ini
                                         onKeyDown={handleSearch}
                                     />
                                 </div>
+
+                                <button
+                                    onClick={handleRefresh}
+                                    disabled={isRefreshing}
+                                    className={`relative text-slate-500 hover:text-sky-600 transition-colors ${isRefreshing ? 'animate-spin' : ''}`}
+                                    title="Refresh Events"
+                                >
+                                    <RefreshCw size={20} />
+                                </button>
                                 <button
                                     onClick={() => {
                                         setShowNotifications(!showNotifications);
@@ -607,11 +619,11 @@ export default function Dashboard({ user, onLogout, onNavigate, initialView, ini
                                 <div className="ml-auto relative">
                                     <input
                                         type="date"
-                                        className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 focus:outline-none focus:border-sky-500 hover:bg-slate-50 cursor-pointer"
+                                        className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 focus:outline-none focus:border-sky-500 hover:bg-slate-50 cursor-pointer relative z-0"
                                         value={selectedDate}
                                         onChange={(e) => setSelectedDate(e.target.value)}
                                     />
-                                    <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+                                    <Calendar size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700 pointer-events-none z-10" />
                                 </div>
                             </div>
 
