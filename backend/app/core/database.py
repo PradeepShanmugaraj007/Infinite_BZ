@@ -10,11 +10,13 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     # Fallback or error if not set
-    print("Warning: DATABASE_URL not found in environment, checking for individual vars or defaults...")
-    # You could construct it here if you wanted, but for now let's trust the user has set it or fail
-    # Default fallback just in case, but usually better to fail if env is missing
-    print("Database URL not found, falling back to localhost")
-    DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/infinite_bz"
+    print("Database URL not found, checking for platform-specific defaults...")
+    if os.getenv("RENDER"):
+        print("Running on Render, using internal database URL")
+        DATABASE_URL = "postgresql+asyncpg://infinitetechai:yoYZCSBWQTuY6DNfPObCYyAQpi3itQQH@dpg-d670ql86fj8s7380oobg-a/infinitetechai_lq9g"
+    else:
+        print("Running locally, using localhost")
+        DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/infinite_bz"
 else:
     print(f"Database URL found: {DATABASE_URL[:20]}... (masked)")
 
