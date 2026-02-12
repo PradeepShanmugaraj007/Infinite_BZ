@@ -16,9 +16,17 @@ if not DATABASE_URL:
     DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/infinite_bz"
 
 # Ensure asyncpg is used
-if DATABASE_URL and not DATABASE_URL.startswith("postgresql+asyncpg://"):
-    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
-engine = create_async_engine(DATABASE_URL, echo=False, future=True)
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
+elif DATABASE_URL and DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+# Fix for Render/Neon SSL issues
+connect_args = {}
+if "render.com" in DATABASE_URL or "neon.tech" in DATABASE_URL:
+    connect_args = {"ssl": "require"}
+
+engine = create_async_engine(DATABASE_URL, echo=False, future=True, connect_args=connect_args)
 
 async def init_db():
     async with engine.begin() as conn:
