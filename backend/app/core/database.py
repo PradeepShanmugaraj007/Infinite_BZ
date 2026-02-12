@@ -13,7 +13,10 @@ if not DATABASE_URL:
     print("Warning: DATABASE_URL not found in environment, checking for individual vars or defaults...")
     # You could construct it here if you wanted, but for now let's trust the user has set it or fail
     # Default fallback just in case, but usually better to fail if env is missing
+    print("Database URL not found, falling back to localhost")
     DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/infinite_bz"
+else:
+    print(f"Database URL found: {DATABASE_URL[:20]}... (masked)")
 
 # Ensure asyncpg is used
 if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
@@ -23,7 +26,7 @@ elif DATABASE_URL and DATABASE_URL.startswith("postgresql://"):
 
 # Fix for Render/Neon SSL issues
 connect_args = {}
-if "render.com" in DATABASE_URL or "neon.tech" in DATABASE_URL or "dpg-" in DATABASE_URL:
+if "render.com" in DATABASE_URL or "neon.tech" in DATABASE_URL:
     connect_args = {"ssl": "require"}
 
 engine = create_async_engine(DATABASE_URL, echo=False, future=True, connect_args=connect_args)
