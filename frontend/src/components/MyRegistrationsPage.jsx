@@ -128,7 +128,7 @@ export default function MyRegistrationsPage({ onNavigate, user }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="bg-white">
       {/* Header */}
       {/* Header Removed as per user request */}
 
@@ -137,40 +137,40 @@ export default function MyRegistrationsPage({ onNavigate, user }) {
         {/* Back Link */}
         <button
           onClick={onNavigate}
-          className="flex items-center gap-2 text-slate-300 mb-8 hover:text-white"
+          className="flex items-center gap-2 text-slate-500 mb-8 hover:text-slate-900"
         >
           <ChevronLeft size={20} />
           Back to home page
         </button>
 
         {/* Title */}
-        <h1 className="text-5xl font-bold text-white mb-8">Your events</h1>
+        <h1 className="text-5xl font-bold text-slate-900 mb-8">Your events</h1>
 
         {/* Tabs */}
         <div className="flex gap-4 mb-8">
           <button
             onClick={() => setActiveTab('going')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition ${activeTab === 'going'
-              ? 'bg-primary-500 text-slate-900'
-              : 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-50'
+            className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold transition-all active:scale-[0.98] ${activeTab === 'going'
+              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25'
+              : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
               }`}
           >
             ✓ Going
           </button>
           <button
             onClick={() => setActiveTab('saved')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition ${activeTab === 'saved'
-              ? 'bg-primary-500 text-slate-900'
-              : 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-50'
+            className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold transition-all active:scale-[0.98] ${activeTab === 'saved'
+              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25'
+              : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
               }`}
           >
             📌 Saved
           </button>
           <button
             onClick={() => setActiveTab('past')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition ${activeTab === 'past'
-              ? 'bg-primary-500 text-slate-900'
-              : 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-50'
+            className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold transition-all active:scale-[0.98] ${activeTab === 'past'
+              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25'
+              : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
               }`}
           >
             ↩ Past
@@ -179,7 +179,7 @@ export default function MyRegistrationsPage({ onNavigate, user }) {
 
         {/* Filter */}
         <div className="mb-6">
-          <button className="flex items-center gap-2 text-slate-300 hover:text-white">
+          <button className="flex items-center gap-2 text-slate-500 hover:text-slate-900">
             📅 From today <span className="ml-2">∨</span>
           </button>
         </div>
@@ -203,17 +203,17 @@ export default function MyRegistrationsPage({ onNavigate, user }) {
             </div>
           ) : getFilteredRegistrations().length === 0 ? (
             <div className="text-center py-10 text-slate-500">
-              <Calendar size={48} className="mx-auto mb-4 text-slate-600" />
-              <h3 className="text-xl font-bold text-white mb-2">
+              <Calendar size={48} className="mx-auto mb-4 text-slate-400" />
+              <h3 className="text-xl font-bold text-slate-900 mb-2">
                 {activeTab === 'going' ? 'No upcoming events' : activeTab === 'past' ? 'No past events' : 'No registrations yet'}
               </h3>
-              <p className="text-slate-400 mb-4">
+              <p className="text-slate-500 mb-4">
                 {activeTab === 'going' ? 'You have no upcoming registered events.' : activeTab === 'past' ? 'You have no past registered events.' : "You haven't registered for any events yet."}
               </p>
               {activeTab !== 'going' && activeTab !== 'past' && (
                 <button
                   onClick={onNavigate}
-                  className="px-6 py-3 bg-primary-500 text-slate-900 rounded-lg font-bold hover:bg-primary-600 transition-colors"
+                  className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/25 active:scale-[0.98]"
                 >
                   Browse Events
                 </button>
@@ -222,8 +222,8 @@ export default function MyRegistrationsPage({ onNavigate, user }) {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {getFilteredRegistrations().map((event, index) => (
-                <div key={event.id || index} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col">
-                  <div className="relative h-32 bg-gradient-to-r from-primary-500 to-indigo-600 flex items-center justify-center">
+                <div key={event.id || index} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all flex flex-col border border-slate-200">
+                  <div className="relative h-32 bg-gradient-to-r from-indigo-500 to-indigo-700 flex items-center justify-center">
                     <div className="absolute top-2 left-2 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
                       <CheckCircle2 size={12} />
                       Registered
@@ -238,7 +238,7 @@ export default function MyRegistrationsPage({ onNavigate, user }) {
                   </div>
 
                   <div className="p-4 flex flex-col flex-1">
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 overflow-hidden text-ellipsis" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                    <h3 className="text-lg font-bold text-slate-900 mb-2 overflow-hidden text-ellipsis" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                       {event.title}
                     </h3>
 
@@ -284,7 +284,7 @@ export default function MyRegistrationsPage({ onNavigate, user }) {
                       {event.raw_data?.source === 'InfiniteBZ' && (
                         <button
                           onClick={() => onNavigate('ticket-details', event)}
-                          className="w-full mt-4 bg-primary-500 hover:bg-primary-600 text-slate-900 font-bold py-2 px-4 rounded-lg transition-all shadow-lg shadow-primary-500/20 flex items-center justify-center gap-2"
+                          className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2 active:scale-[0.98]"
                         >
                           <QrCode size={18} />
                           Show Ticket
@@ -297,7 +297,7 @@ export default function MyRegistrationsPage({ onNavigate, user }) {
                           href={event.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="block w-full mt-4 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg text-center transition-colors flex items-center justify-center gap-2"
+                          className="block w-full mt-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 px-4 rounded-xl text-center transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
                         >
                           Go to official source
                         </a>
@@ -316,7 +316,7 @@ export default function MyRegistrationsPage({ onNavigate, user }) {
         <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
             {/* Header */}
-            <div className="bg-gradient-to-r from-primary-500 to-indigo-600 px-6 py-4">
+            <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
@@ -367,7 +367,7 @@ export default function MyRegistrationsPage({ onNavigate, user }) {
                 </button>
                 <button
                   onClick={downloadQR}
-                  className="flex-1 bg-primary-500 hover:bg-primary-600 text-white py-3 px-4 rounded-lg font-medium transition-colors shadow-lg shadow-primary-500/20"
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-xl font-bold transition-all shadow-lg shadow-indigo-600/20 active:scale-[0.98]"
                 >
                   Download QR
                 </button>

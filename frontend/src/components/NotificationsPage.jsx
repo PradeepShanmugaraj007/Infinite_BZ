@@ -192,16 +192,16 @@ const NotificationsPage = ({ notifications = [] }) => {
 
   return (
     <>
-      <div className="min-h-screen bg-slate-900">
+      <div className="bg-white">
         <div className="w-full">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-white">Notifications {unread > 0 && <span className="ml-2 bg-primary-500 text-slate-900 px-2 py-1 rounded-full text-sm font-bold">{unread}</span>}</h1>
+            <h1 className="text-3xl font-bold text-slate-900">Notifications {unread > 0 && <span className="ml-2 bg-indigo-600 text-white px-2 py-1 rounded-full text-sm font-bold">{unread}</span>}</h1>
             <div className="flex items-center space-x-4">
               <input
                 type="text"
                 placeholder="Search notifications..."
-                className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none shadow-sm"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -213,7 +213,7 @@ const NotificationsPage = ({ notifications = [] }) => {
             {filteredNotifications.map((notif, index) => {
               const originalActivity = notifications[index]; // Get the original activity data
               return (
-                <div key={notif.id} className="bg-slate-800 border border-slate-700 rounded-xl shadow-lg py-6 px-6 hover:bg-slate-750 transition-colors">
+                <div key={notif.id} className="bg-white border border-slate-200 rounded-xl shadow-sm py-6 px-6 hover:shadow-md transition-all">
                   <div className="flex items-start space-x-4">
                     <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 flex items-center justify-center">
                       <img
@@ -240,14 +240,14 @@ const NotificationsPage = ({ notifications = [] }) => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-white truncate">{notif.title}</h3>
+                        <h3 className="text-lg font-semibold text-slate-900 truncate">{notif.title}</h3>
                         <span className="text-sm text-slate-400 ml-2">{notif.time}</span>
                       </div>
-                      <p className="mt-1 text-sm text-slate-300">{notif.subtitle}</p>
+                      <p className="mt-1 text-sm text-slate-500">{notif.subtitle}</p>
                     </div>
                     <div className="flex items-center space-x-2 ml-4">
                       {notif.badge && (
-                        <span className="w-3 h-3 bg-primary-500 rounded-full"></span>
+                        <span className="w-3 h-3 bg-indigo-500 rounded-full"></span>
                       )}
                       {notif.action && (
                         <button
@@ -263,7 +263,7 @@ const NotificationsPage = ({ notifications = [] }) => {
                               markAsRead(notif.id);
                             }
                           }}
-                          className="text-sm text-primary-400 hover:text-primary-300 font-medium px-3 py-1 rounded-md hover:bg-primary-500/10 transition-colors"
+                          className="text-sm text-indigo-600 hover:text-indigo-700 font-medium px-3 py-1 rounded-md hover:bg-indigo-50 transition-colors"
                         >
                           {notif.action}
                         </button>

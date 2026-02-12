@@ -1,76 +1,131 @@
-import { LayoutDashboard, ClipboardList, TrendingUp, Settings, LogOut, ScanLine, Plus, Infinity } from 'lucide-react';
+import React from 'react';
+import {
+    LayoutDashboard,
+    Calendar,
+    Ticket,
+    Bell,
+    Settings,
+    LogOut,
+    Plus,
+    X,
+    Menu,
+    Heart,
+    Infinity
+} from 'lucide-react';
 
 export default function Sidebar({ activePage, onNavigate, onLogout, onCreateClick }) {
+    const [isOpen, setIsOpen] = React.useState(false);
+
+    const menuItems = [
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { id: 'my-events', label: 'Events', icon: Calendar },
+        { id: 'my-registrations', label: 'My Registrations', icon: Ticket },
+        { id: 'saved-events', label: 'Saved Events', icon: Heart },
+    ];
+
+    const toggleSidebar = () => setIsOpen(!isOpen);
+
     return (
-        <aside className="w-64 bg-slate-900 border-r border-white/20 flex flex-col fixed h-full z-20 hidden lg:flex text-white transition-all duration-300">
-            <div className="p-6">
-                <div className="flex items-center gap-3 font-bold text-xl text-white cursor-pointer" onClick={() => onNavigate('dashboard')}>
-                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-lg shadow-white/10">
-                        <Infinity className="text-primary-500" size={20} strokeWidth={3} />
+        <>
+            {/* Mobile Menu Button - Only visible on small screens */}
+            <button
+                onClick={toggleSidebar}
+                className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 text-white rounded-lg shadow-lg hover:bg-slate-700 transition-colors"
+            >
+                {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+
+            {/* Overlay for mobile */}
+            {isOpen && (
+                <div
+                    className="lg:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
+                    onClick={() => setIsOpen(false)}
+                />
+            )}
+
+            {/* Sidebar Container */}
+            <aside className={`
+                fixed top-0 left-0 h-screen w-64 bg-white border-r border-slate-200 flex flex-col z-40 transition-transform duration-300
+                ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            `}>
+                <div className="h-full flex flex-col">
+                    {/* Logo Area */}
+                    <div className="h-24 flex items-center px-8">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+                                <Infinity size={24} />
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-xl font-black text-slate-900 font-outfit tracking-tight leading-none">
+                                    InfiniteBZ
+                                </span>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                                    CHENNAI EDITION
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        InfiniteBZ
-                        <span className="block text-[10px] font-normal text-white/70">Chennai Edition</span>
+
+                    {/* Menu Label */}
+                    <div className="px-8 mt-4 mb-2">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Menu</span>
+                    </div>
+
+                    {/* Navigation Links */}
+                    <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+                        {menuItems.map((item) => {
+                            const Icon = item.icon;
+                            const isActive = activePage === item.id;
+                            return (
+                                <button
+                                    key={item.id}
+                                    onClick={() => {
+                                        onNavigate(item.id);
+                                        setIsOpen(false);
+                                    }}
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
+                                        ? 'bg-indigo-50 text-indigo-600 font-bold'
+                                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                                        }`}
+                                >
+                                    <Icon size={20} className={isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600 transition-colors'} />
+                                    <span className="text-sm">{item.label}</span>
+                                </button>
+                            );
+                        })}
+                    </nav>
+
+                    {/* System Label */}
+                    <div className="px-8 mt-6 mb-2">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">System</span>
+                    </div>
+
+                    {/* Settings Item */}
+                    <div className="px-4 mb-auto">
+                        <button
+                            onClick={() => onNavigate('settings')}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${activePage === 'settings'
+                                ? 'bg-indigo-50 text-indigo-600 font-bold'
+                                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                                }`}
+                        >
+                            <Settings size={20} className={activePage === 'settings' ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600 transition-colors'} />
+                            <span className="text-sm">Settings</span>
+                        </button>
+                    </div>
+
+                    {/* Sign Out - Absolute bottom style */}
+                    <div className="p-4 mt-auto">
+                        <button
+                            onClick={onLogout}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all group"
+                        >
+                            <LogOut size={20} className="group-hover:text-indigo-600 transition-colors" />
+                            <span className="text-sm font-medium">Sign Out</span>
+                        </button>
                     </div>
                 </div>
-            </div>
-
-            <nav className="flex-1 px-4 space-y-1 mt-6">
-                <NavItem
-                    icon={<LayoutDashboard size={20} />}
-                    label="Dashboard"
-                    active={activePage === 'dashboard' || activePage === 'feed'}
-                    onClick={() => onNavigate('dashboard')}
-                />
-                <NavItem
-                    icon={<ClipboardList size={20} />}
-                    label="My Events"
-                    active={activePage === 'my-events'}
-                    onClick={() => onNavigate('my-events')}
-                />
-                <NavItem
-                    icon={<TrendingUp size={20} />}
-                    label="My Registrations"
-                    active={activePage === 'my-registrations'}
-                    onClick={() => onNavigate('my-registrations')}
-                />
-
-                <NavItem
-                    icon={<Settings size={20} />}
-                    label="Settings"
-                    active={activePage === 'settings'}
-                    onClick={() => onNavigate('settings')}
-                />
-            </nav>
-
-            <div className="p-4">
-                <button
-                    onClick={onCreateClick}
-                    className="w-full py-3.5 bg-gradient-to-r from-primary-500 to-indigo-600 hover:from-primary-400 hover:to-indigo-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary-500/25 flex items-center justify-center gap-2 transform hover:scale-[1.02] active:scale-[0.98] group"
-                >
-                    <Plus size={18} className="text-white group-hover:rotate-90 transition-transform duration-300" />
-                    <span className="text-xs uppercase tracking-wider font-bold">Create Event</span>
-                </button>
-                <button onClick={onLogout} className="flex items-center gap-3 px-4 py-3 w-full text-white/70 hover:text-white mt-4 transition-colors rounded-lg hover:bg-white/5">
-                    <LogOut size={18} />
-                    <span className="font-medium">Sign Out</span>
-                </button>
-            </div>
-        </aside>
+            </aside>
+        </>
     );
-}
-
-function NavItem({ icon, label, active, onClick }) {
-    return (
-        <button
-            onClick={onClick}
-            className={`flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all mb-1 ${active
-                ? 'bg-white/10 text-white font-bold border border-white/5'
-                : 'text-white/70 hover:bg-white/5 hover:text-white'
-                }`}
-        >
-            {icon}
-            <span className="text-sm">{label}</span>
-        </button>
-    )
 }

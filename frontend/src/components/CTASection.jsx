@@ -1,9 +1,9 @@
 
 import React from 'react';
 
-export const CTASection = () => {
+export const CTASection = ({ onLogin, onSignup }) => {
     return (
-        <section className="bg-slate-900 py-20">
+        <section className="bg-slate-900 py-10">
             <div className="max-w-7xl mx-auto px-4 text-center">
                 <div className="inline-block px-4 py-1.5 rounded-full bg-teal-500/10 text-teal-400 text-sm font-bold tracking-widest uppercase mb-6">
                     Growth Engine
@@ -13,16 +13,22 @@ export const CTASection = () => {
                 </h2>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <button className="bg-teal-500 hover:bg-teal-400 text-white px-8 py-4 rounded-full font-bold text-lg shadow-xl shadow-teal-500/20 transition-all active:scale-95">
+                    <button
+                        onClick={onLogin}
+                        className="bg-teal-500 hover:bg-teal-400 text-white px-8 py-4 rounded-full font-bold text-lg shadow-xl shadow-teal-500/20 transition-all active:scale-95"
+                    >
                         Join Free - No Credit Card Needed
                     </button>
-                    <button className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-full font-bold text-lg backdrop-blur-sm border border-white/20 transition-all active:scale-95">
+                    <button
+                        onClick={onSignup}
+                        className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-full font-bold text-lg backdrop-blur-sm border border-white/20 transition-all active:scale-95"
+                    >
                         Schedule a Demo
                     </button>
                 </div>
 
                 <p className="mt-8 text-slate-400 text-sm">
-                    Joined by 5,000+ businesses across Chennai last month.
+                    The heartbeat of Chennai’s startup & business ecosystem.
                 </p>
             </div>
         </section>

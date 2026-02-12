@@ -126,12 +126,12 @@ export default function MyEvents({ onCreateNew, onNavigate }) {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-white mb-2">My Events</h1>
-                    <p className="text-slate-400">Manage your events, track analytics, and engage with your audience.</p>
+                    <h1 className="text-3xl font-bold text-slate-900 mb-2">My Events</h1>
+                    <p className="text-slate-500">Manage your events, track analytics, and engage with your audience.</p>
                 </div>
                 <button
                     onClick={onCreateNew}
-                    className="group relative px-6 py-3 bg-gradient-to-r from-primary-500 to-indigo-600 rounded-xl font-bold text-white shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    className="group relative px-6 py-3 bg-indigo-600 rounded-xl font-bold text-white shadow-lg shadow-indigo-600/25 hover:bg-indigo-700 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                     <span className="flex items-center gap-2">
                         <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
@@ -142,42 +142,42 @@ export default function MyEvents({ onCreateNew, onNavigate }) {
 
             {/* Quick Stats Row */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-slate-800/50 border border-slate-700/50 p-6 rounded-2xl flex items-center gap-6 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 text-slate-700 opacity-20 group-hover:scale-110 transition-transform">
+                <div className="bg-white border border-slate-200 p-6 rounded-2xl flex items-center gap-6 relative overflow-hidden group shadow-sm hover:shadow-md transition-shadow">
+                    <div className="absolute top-0 right-0 p-4 text-slate-100 opacity-50 group-hover:scale-110 transition-transform">
                         <Calendar size={80} />
                     </div>
-                    <div className="p-4 bg-indigo-500/10 rounded-xl text-indigo-400">
+                    <div className="p-4 bg-indigo-50 rounded-xl text-indigo-600">
                         <Calendar size={32} />
                     </div>
-                    <div>
-                        <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Total Events</p>
-                        <h3 className="text-3xl font-bold text-white">{activeCount}</h3>
+                    <div className="relative z-10">
+                        <p className="text-slate-500 text-sm font-medium uppercase tracking-wider">Total Events</p>
+                        <h3 className="text-3xl font-bold text-slate-900">{activeCount}</h3>
                     </div>
                 </div>
 
-                <div className="bg-slate-800/50 border border-slate-700/50 p-6 rounded-2xl flex items-center gap-6 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 text-slate-700 opacity-20 group-hover:scale-110 transition-transform">
+                <div className="bg-white border border-slate-200 p-6 rounded-2xl flex items-center gap-6 relative overflow-hidden group shadow-sm hover:shadow-md transition-shadow">
+                    <div className="absolute top-0 right-0 p-4 text-slate-100 opacity-50 group-hover:scale-110 transition-transform">
                         <Users size={80} />
                     </div>
-                    <div className="p-4 bg-green-500/10 rounded-xl text-green-400">
+                    <div className="p-4 bg-green-50 rounded-xl text-green-600">
                         <Users size={32} />
                     </div>
-                    <div>
-                        <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Total Attendees</p>
-                        <h3 className="text-3xl font-bold text-white">{totalAttendees}</h3>
+                    <div className="relative z-10">
+                        <p className="text-slate-500 text-sm font-medium uppercase tracking-wider">Total Attendees</p>
+                        <h3 className="text-3xl font-bold text-slate-900">{totalAttendees}</h3>
                     </div>
                 </div>
 
-                <div className="bg-slate-800/50 border border-slate-700/50 p-6 rounded-2xl flex items-center gap-6 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 text-slate-700 opacity-20 group-hover:scale-110 transition-transform">
+                <div className="bg-white border border-slate-200 p-6 rounded-2xl flex items-center gap-6 relative overflow-hidden group shadow-sm hover:shadow-md transition-shadow">
+                    <div className="absolute top-0 right-0 p-4 text-slate-100 opacity-50 group-hover:scale-110 transition-transform">
                         <MapPin size={80} />
                     </div>
-                    <div className="p-4 bg-pink-500/10 rounded-xl text-pink-400">
+                    <div className="p-4 bg-pink-50 rounded-xl text-pink-600">
                         <MapPin size={32} />
                     </div>
-                    <div>
-                        <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Top Location</p>
-                        <h3 className="text-2xl font-bold text-white">Chennai</h3>
+                    <div className="relative z-10">
+                        <p className="text-slate-500 text-sm font-medium uppercase tracking-wider">Top Location</p>
+                        <h3 className="text-2xl font-bold text-slate-900">Chennai</h3>
                     </div>
                 </div>
             </div>
@@ -185,40 +185,39 @@ export default function MyEvents({ onCreateNew, onNavigate }) {
             {/* Search & Filter */}
             <div className="flex gap-4">
                 <div className="relative flex-1">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                     <input
                         type="text"
                         placeholder="Search your events..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-primary-500 transition-colors"
+                        className="w-full bg-white border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
                     />
                 </div>
-
             </div>
 
             {/* Events Table Container */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
                 {loading ? (
                     <div className="p-20 text-center text-slate-500 flex flex-col items-center">
-                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500 mb-4"></div>
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mb-4"></div>
                         <p>Loading your dashboard...</p>
                     </div>
                 ) : filteredEvents.length === 0 ? (
                     <div className="p-20 text-center">
-                        <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Calendar size={40} className="text-slate-600" />
+                        <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Calendar size={40} className="text-slate-400" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">No events found</h3>
-                        <p className="text-slate-400 max-w-sm mx-auto mb-8">Get started by creating your first event. It only takes a few minutes.</p>
-                        <button onClick={onCreateNew} className="text-primary-400 hover:text-primary-300 font-bold hover:underline">
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">No events found</h3>
+                        <p className="text-slate-500 max-w-sm mx-auto mb-8">Get started by creating your first event. It only takes a few minutes.</p>
+                        <button onClick={onCreateNew} className="text-indigo-600 hover:text-indigo-500 font-bold hover:underline">
                             Create your first event &rarr;
                         </button>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
-                            <thead className="bg-slate-950/50 text-xs uppercase font-bold text-slate-500 border-b border-slate-800">
+                            <thead className="bg-slate-50 text-xs uppercase font-bold text-slate-500 border-b border-slate-200">
                                 <tr>
                                     <th className="px-6 py-4">Event Details</th>
                                     <th className="px-6 py-4">Status</th>
@@ -227,23 +226,23 @@ export default function MyEvents({ onCreateNew, onNavigate }) {
                                     <th className="px-6 py-4 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-800/50">
+                            <tbody className="divide-y divide-slate-100">
                                 {filteredEvents.map(event => (
-                                    <tr key={event.id} className="group hover:bg-slate-800/30 transition-colors">
+                                    <tr key={event.id} className="group hover:bg-slate-50 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-16 h-16 rounded-lg bg-slate-800 flex-shrink-0 overflow-hidden border border-slate-700/50">
+                                                <div className="w-16 h-16 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden border border-slate-200">
                                                     {event.image_url ? (
                                                         <img src={event.image_url} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                                                     ) : (
-                                                        <div className="w-full h-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
-                                                            <Calendar size={20} className="text-slate-500" />
+                                                        <div className="w-full h-full bg-gradient-to-br from-fuchsia-500/10 to-pink-500/10 flex items-center justify-center">
+                                                            <Calendar size={20} className="text-slate-400" />
                                                         </div>
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-bold text-white text-base group-hover:text-primary-400 transition-colors">{event.title}</h4>
-                                                    <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
+                                                    <h4 className="font-bold text-slate-900 text-base group-hover:text-indigo-600 transition-colors">{event.title}</h4>
+                                                    <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
                                                         <span className="flex items-center gap-1"><Clock size={12} /> {new Date(event.start_time).toLocaleDateString()}</span>
                                                         <span className="flex items-center gap-1">
                                                             <MapPin size={12} />
@@ -262,19 +261,19 @@ export default function MyEvents({ onCreateNew, onNavigate }) {
                                         <td className="px-6 py-4">
                                             <div className="w-32">
                                                 <div className="flex justify-between text-xs mb-1.5">
-                                                    <span className="text-white font-bold">{event.registration_count || 0}</span>
+                                                    <span className="text-slate-900 font-bold">{event.registration_count || 0}</span>
                                                     <span className="text-slate-500">/{event.raw_data?.capacity || 100}</span>
                                                 </div>
-                                                <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                                <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                                                     <div
-                                                        className="h-full bg-primary-500 rounded-full"
+                                                        className="h-full bg-indigo-600 rounded-full"
                                                         style={{ width: `${Math.min(((event.registration_count || 0) / (event.raw_data?.capacity || 100)) * 100, 100)}%` }}
                                                     />
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="text-slate-300 font-mono text-sm">
+                                            <span className="text-slate-700 font-mono text-sm">
                                                 {event.is_free ? 'Free' : `₹${(event.raw_data?.price || 0) * (event.registration_count || 0)}`}
                                             </span>
                                         </td>
@@ -282,19 +281,19 @@ export default function MyEvents({ onCreateNew, onNavigate }) {
                                             <div className="flex items-center justify-end gap-2">
                                                 <button
                                                     onClick={() => { setSelectedEvent(event); setStatsModalOpen(true); }}
-                                                    className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors" title="View Details"
+                                                    className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors" title="View Details"
                                                 >
                                                     <Eye size={18} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleEditClick(event)}
-                                                    className="p-2 text-indigo-400 hover:text-indigo-300 hover:bg-slate-700/50 rounded-lg transition-colors" title="Edit Event"
+                                                    className="p-2 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-colors" title="Edit Event"
                                                 >
                                                     <Edit size={18} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(event)}
-                                                    className="p-2 text-red-400 hover:text-red-300 hover:bg-slate-700/50 rounded-lg transition-colors" title="Delete Event"
+                                                    className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors" title="Delete Event"
                                                 >
                                                     <Trash2 size={16} />
                                                 </button>

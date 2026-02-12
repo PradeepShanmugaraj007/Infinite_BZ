@@ -202,7 +202,7 @@ export default function SettingsPage({ user, onNavigate, hideSidebar = false, on
   };
 
   return (
-    <div className="min-h-screen flex font-sans">
+    <div className="min-h-screen flex font-sans bg-[#F3F4F6]">
       {!hideSidebar && (
         <Sidebar
           activePage="settings"
@@ -218,15 +218,15 @@ export default function SettingsPage({ user, onNavigate, hideSidebar = false, on
       <main className={`flex-1 p-8 ${hideSidebar ? 'flex justify-center' : 'lg:ml-64'}`}>
         <div className={`w-full ${hideSidebar ? 'max-w-5xl' : ''}`}>
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-white">Settings</h1>
+            <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Left Sidebar - Profile Card */}
             <div className="lg:col-span-1">
-              <div className="bg-slate-800 border border-slate-700 rounded-xl p-6">
+              <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                 <div className="text-center">
-                  <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden flex items-center justify-center">
+                  <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden flex items-center justify-center border-4 border-slate-50">
                     {profileImagePreview || formData.profileImage ? (
                       <img
                         src={profileImagePreview || formData.profileImage}
@@ -254,7 +254,7 @@ export default function SettingsPage({ user, onNavigate, hideSidebar = false, on
                     />
                     <label
                       htmlFor="profile-image-upload"
-                      className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-slate-300 hover:bg-slate-600 cursor-pointer transition-colors text-sm"
+                      className="px-4 py-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-200 cursor-pointer transition-colors text-sm font-medium"
                     >
                       Choose Image
                     </label>
@@ -267,7 +267,7 @@ export default function SettingsPage({ user, onNavigate, hideSidebar = false, on
                       {followersCount} following
                     </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-1">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-1">
                     {formData.firstName || formData.lastName ?
                       `${formData.firstName} ${formData.lastName}`.trim() :
                       'Arjun Reddy'
@@ -280,10 +280,10 @@ export default function SettingsPage({ user, onNavigate, hideSidebar = false, on
                     }
                   </p>
 
-                  <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-slate-600 mb-6">
+                  <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-slate-100 mb-6">
                     <div>
-                      <div className="text-lg font-bold text-white">{calculateProfileCompletion()}%</div>
-                      <div className="text-xs text-slate-400">PROFILE</div>
+                      <div className="text-lg font-bold text-slate-900">{calculateProfileCompletion()}%</div>
+                      <div className="text-xs text-slate-500 font-bold tracking-wider">PROFILE</div>
                     </div>
                     <div className="flex flex-col items-center">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold ${user?.is_active
@@ -292,37 +292,37 @@ export default function SettingsPage({ user, onNavigate, hideSidebar = false, on
                         }`}>
                         {user?.is_active ? <Check size={20} /> : <X size={20} />}
                       </div>
-                      <div className="text-xs text-slate-400 mt-1">Active</div>
+                      <div className="text-xs text-slate-500 font-bold tracking-wider mt-1">Active</div>
                     </div>
                     <div>
-                      <div className="text-lg font-bold text-white">Pro</div>
-                      <div className="text-xs text-slate-400">PLAN</div>
+                      <div className="text-lg font-bold text-slate-900">Pro</div>
+                      <div className="text-xs text-slate-500 font-bold tracking-wider">PLAN</div>
                     </div>
                   </div>
 
                   <div className="space-y-4">
-                    <div className="flex items-start gap-3 p-3 bg-slate-700 rounded-lg">
-                      <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs mt-0.5">✓</div>
+                    <div className="flex items-start gap-3 p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+                      <div className="w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center text-white text-xs mt-0.5">✓</div>
                       <div className="text-left">
-                        <div className="font-semibold text-sm text-white">12</div>
-                        <div className="text-xs text-slate-400">Events Attended</div>
-                        <div className="text-xs text-green-400 font-medium">+2 this week</div>
+                        <div className="font-semibold text-sm text-slate-900">12</div>
+                        <div className="text-xs text-slate-500">Events Attended</div>
+                        <div className="text-xs text-green-600 font-medium">+2 this week</div>
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3 p-3 bg-slate-700 rounded-lg">
-                      <div className="w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs mt-0.5">⚡</div>
+                    <div className="flex items-start gap-3 p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+                      <div className="w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center text-white text-xs mt-0.5">⚡</div>
                       <div className="text-left">
-                        <div className="font-semibold text-sm text-white">45</div>
-                        <div className="text-xs text-slate-400">Auto-Registrations</div>
+                        <div className="font-semibold text-sm text-slate-900">45</div>
+                        <div className="text-xs text-slate-500">Auto-Registrations</div>
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3 p-3 bg-slate-700 rounded-lg">
+                    <div className="flex items-start gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100">
                       <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs mt-0.5">🔗</div>
                       <div className="text-left">
-                        <div className="font-semibold text-sm text-white">3</div>
-                        <div className="text-xs text-slate-400">Linked Accounts</div>
+                        <div className="font-semibold text-sm text-slate-900">3</div>
+                        <div className="text-xs text-slate-500">Linked Accounts</div>
                       </div>
                     </div>
                   </div>
@@ -343,30 +343,30 @@ export default function SettingsPage({ user, onNavigate, hideSidebar = false, on
               )}
 
               {/* Personal Information Form */}
-              <div className="bg-slate-800 border border-slate-700 rounded-xl p-8">
-                <h3 className="text-lg font-semibold text-white mb-6">Personal Information</h3>
-                <p className="text-xs text-slate-400 mb-6">Used for event registration</p>
+              <div className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
+                <h3 className="text-lg font-semibold text-slate-900 mb-6">Personal Information</h3>
+                <p className="text-xs text-slate-500 mb-6">Used for event registration</p>
 
                 <div className="grid grid-cols-2 gap-6 mb-6">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">First Name <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">First Name <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-2 bg-slate-700 border rounded-lg text-white outline-none focus:border-blue-500 ${!formData.firstName ? 'border-red-500' : 'border-slate-600'}`}
+                      className={`w-full px-4 py-2 bg-white border rounded-lg text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all ${!formData.firstName ? 'border-red-500' : 'border-slate-300'}`}
                     />
                     {!formData.firstName && <span className="text-xs text-red-500 mt-1 block">First Name is required</span>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Last Name <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Last Name <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-2 bg-slate-700 border rounded-lg text-white outline-none focus:border-blue-500 ${!formData.lastName ? 'border-red-500' : 'border-slate-600'}`}
+                      className={`w-full px-4 py-2 bg-white border rounded-lg text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all ${!formData.lastName ? 'border-red-500' : 'border-slate-300'}`}
                     />
                     {!formData.lastName && <span className="text-xs text-red-500 mt-1 block">Last Name is required</span>}
                   </div>
@@ -374,24 +374,24 @@ export default function SettingsPage({ user, onNavigate, hideSidebar = false, on
 
                 <div className="grid grid-cols-2 gap-6 mb-6">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Email Address <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Email Address <span className="text-red-500">*</span></label>
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-2 bg-slate-700 border rounded-lg text-white outline-none focus:border-blue-500 ${!formData.email ? 'border-red-500' : 'border-slate-600'}`}
+                      className={`w-full px-4 py-2 bg-white border rounded-lg text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all ${!formData.email ? 'border-red-500' : 'border-slate-300'}`}
                     />
                     {!formData.email && <span className="text-xs text-red-500 mt-1 block">Email is required</span>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Phone Number <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Phone Number <span className="text-red-500">*</span></label>
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-2 bg-slate-700 border rounded-lg text-white outline-none focus:border-blue-500 ${!formData.phone ? 'border-red-500' : 'border-slate-600'}`}
+                      className={`w-full px-4 py-2 bg-white border rounded-lg text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all ${!formData.phone ? 'border-red-500' : 'border-slate-300'}`}
                     />
                     {!formData.phone && <span className="text-xs text-red-500 mt-1 block">Phone Number is required</span>}
                   </div>
@@ -399,24 +399,24 @@ export default function SettingsPage({ user, onNavigate, hideSidebar = false, on
 
                 <div className="grid grid-cols-2 gap-6 mb-6">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Job Title <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Job Title <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       name="jobTitle"
                       value={formData.jobTitle}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-2 bg-slate-700 border rounded-lg text-white outline-none focus:border-blue-500 ${!formData.jobTitle ? 'border-red-500' : 'border-slate-600'}`}
+                      className={`w-full px-4 py-2 bg-white border rounded-lg text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all ${!formData.jobTitle ? 'border-red-500' : 'border-slate-300'}`}
                     />
                     {!formData.jobTitle && <span className="text-xs text-red-500 mt-1 block">Job Title is required</span>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Company <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Company <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       name="company"
                       value={formData.company}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-2 bg-slate-700 border rounded-lg text-white outline-none focus:border-blue-500 ${!formData.company ? 'border-red-500' : 'border-slate-600'}`}
+                      className={`w-full px-4 py-2 bg-white border rounded-lg text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all ${!formData.company ? 'border-red-500' : 'border-slate-300'}`}
                     />
                     {!formData.company && <span className="text-xs text-red-500 mt-1 block">Company is required</span>}
                   </div>
@@ -425,13 +425,13 @@ export default function SettingsPage({ user, onNavigate, hideSidebar = false, on
 
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Bio / Intro</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Bio / Intro</label>
                   <textarea
                     name="bio"
                     value={formData.bio}
                     onChange={handleInputChange}
                     rows="3"
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white outline-none focus:border-blue-500"
+                    className="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all"
                   />
                 </div>
 
@@ -439,9 +439,9 @@ export default function SettingsPage({ user, onNavigate, hideSidebar = false, on
                   <button
                     onClick={handleSave}
                     disabled={calculateProfileCompletion() < 86}
-                    className={`px-6 py-2 font-medium rounded-lg flex items-center gap-2 transition-colors ${calculateProfileCompletion() >= 86
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                    className={`px-6 py-2.5 font-bold rounded-xl flex items-center gap-2 transition-all shadow-lg active:scale-[0.98] ${calculateProfileCompletion() >= 86
+                      ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20'
+                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                       }`}
                   >
                     Save Changes

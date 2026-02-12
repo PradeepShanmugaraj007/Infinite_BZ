@@ -185,38 +185,30 @@ export default function EventTicketPage({ eventId, onNavigate, onCancelSuccess, 
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-slate-900">
-            {/* Header */}
-            <header className="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center">
-                    {/* Logo */}
-                    <div className="flex items-center gap-2">
-                        <div className="text-2xl font-bold text-primary-500">InfiniteBZ</div>
-                    </div>
-                </div>
-            </header>
+        <div className="">
+            {/* Main Content */}
 
             {/* Main Content */}
             <main className="max-w-7xl mx-auto px-6 py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left Column - Event Card */}
                     <div className="lg:col-span-1">
-                        <div className="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+                        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
                             {/* Event Image Header */}
-                            <div className="relative bg-gradient-to-r from-blue-900 via-purple-900 to-blue-800 p-4 min-h-40">
+                            <div className="relative bg-gradient-to-r from-indigo-700 via-indigo-800 to-indigo-900 p-4 min-h-40">
                                 {/* Diagonal stripes pattern */}
                                 <div className="absolute inset-0 opacity-20">
                                     <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                                         <defs>
                                             <pattern id="diagonalHatch" x="10" y="10" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
-                                                <line x1="0" y1="0" x2="0" y2="20" stroke="#ff6b35" strokeWidth="15" />
+                                                <line x1="0" y1="0" x2="0" y2="20" stroke="#818cf8" strokeWidth="15" />
                                             </pattern>
                                         </defs>
                                         <rect width="100%" height="100%" fill="url(#diagonalHatch)" />
@@ -247,7 +239,7 @@ export default function EventTicketPage({ eventId, onNavigate, onCancelSuccess, 
                             {/* Event Details */}
                             <div className="p-6">
                                 <div className="flex items-start justify-between mb-4">
-                                    <h2 className="text-xl font-bold text-white flex-1">
+                                    <h2 className="text-xl font-bold text-slate-900 flex-1">
                                         {eventData?.title || "Event Name"}
                                     </h2>
 
@@ -256,31 +248,31 @@ export default function EventTicketPage({ eventId, onNavigate, onCancelSuccess, 
                                 {/* Event Details */}
                                 <div className="mb-6">
                                     {/*<h3 className="text-lg font-semibold text-white mb-2">{eventData?.title || "Event Name"}</h3>*/}
-                                    <p className="text-sm text-slate-400 mb-1">
-                                        <span className="font-medium text-slate-300">Organizer:</span> {eventData?.organizer_name || "Event Organizer"}
+                                    <p className="text-sm text-slate-500 mb-1">
+                                        <span className="font-medium text-slate-700">Organizer:</span> {eventData?.organizer_name || "Event Organizer"}
                                     </p>
-                                    <p className="text-sm text-slate-400 mb-1">
-                                        <span className="font-medium text-slate-300">User:</span> {user?.full_name || "Sachin S"}
+                                    <p className="text-sm text-slate-500 mb-1">
+                                        <span className="font-medium text-slate-700">User:</span> {user?.full_name || "Sachin S"}
                                     </p>
-                                    <p className="text-sm text-slate-400 mb-1">
-                                        <span className="font-medium text-slate-300">Date:</span> {eventData?.start_time ? formatDate(eventData.start_time) : 'Fri, Jan 16'}
+                                    <p className="text-sm text-slate-500 mb-1">
+                                        <span className="font-medium text-slate-700">Date:</span> {eventData?.start_time ? formatDate(eventData.start_time) : 'Fri, Jan 16'}
                                     </p>
-                                    <p className="text-sm text-slate-400">
-                                        <span className="font-medium text-slate-300">Time:</span> {eventData?.start_time ? formatTime(eventData.start_time) : '10:30 PM'}
+                                    <p className="text-sm text-slate-500">
+                                        <span className="font-medium text-slate-700">Time:</span> {eventData?.start_time ? formatTime(eventData.start_time) : '10:30 PM'}
                                     </p>
                                 </div>
 
                                 {/* Action Buttons */}
                                 <button
                                     onClick={downloadQR}
-                                    className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 px-4 rounded mb-3 transition shadow-lg shadow-primary-500/20"
+                                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl mb-3 transition shadow-lg shadow-indigo-600/20 active:scale-[0.98]"
                                 >
                                     Download Ticket
                                 </button>
 
                                 <button
                                     onClick={cancelOrder}
-                                    className="w-full border-2 border-slate-600 hover:border-slate-500 text-slate-300 hover:text-white font-semibold py-3 px-4 rounded mb-6 transition"
+                                    className="w-full border-2 border-slate-100 hover:border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-bold py-3.5 px-4 rounded-xl mb-6 transition active:scale-[0.98]"
                                 >
                                     Cancel Order
                                 </button>
@@ -288,11 +280,11 @@ export default function EventTicketPage({ eventId, onNavigate, onCancelSuccess, 
 
 
                                 {/* Order Info */}
-                                <div className="border-t border-slate-700 pt-4">
-                                    <p className="text-xs text-slate-400 mb-2">
+                                <div className="border-t border-slate-200 pt-4">
+                                    <p className="text-xs text-slate-500 mb-2">
                                         {eventData?.is_free ? 'Free' : 'Paid'} Order {eventData?.id || '14046799613'} on {eventData?.registration_date ? new Date(eventData.registration_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Jan 12, 2026'}
                                     </p>
-                                    <a href="#" className="text-primary-400 hover:text-primary-300 text-xs font-medium">
+                                    <a href="#" className="text-indigo-600 hover:text-indigo-500 text-xs font-medium hover:underline">
                                         Report this event
                                     </a>
                                 </div>
@@ -302,52 +294,52 @@ export default function EventTicketPage({ eventId, onNavigate, onCancelSuccess, 
 
                     {/* Right Column - Ticket Details */}
                     <div className="lg:col-span-2">
-                        <div className="bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-sm">
+                        <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
                             {/* Header */}
-                            <div className="flex items-center mb-8 border-b border-slate-700 pb-6">
-                                <h1 className="text-3xl font-bold text-white">General Admission</h1>
+                            <div className="flex items-center mb-8 border-b border-slate-200 pb-6">
+                                <h1 className="text-3xl font-bold text-slate-900">General Admission</h1>
                             </div>
 
                             {/* Contact Information */}
                             <div>
-                                <h2 className="text-lg font-semibold text-white mb-6">Contact Information</h2>
+                                <h2 className="text-lg font-semibold text-slate-900 mb-6">Contact Information</h2>
 
                                 {/* Attendee */}
                                 <div className="mb-6">
-                                    <label className="block text-sm font-semibold text-white mb-2">
+                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
                                         Attendee <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
                                         value={user?.full_name || "SACHIN S"}
                                         readOnly
-                                        className="w-full px-0 py-2 border-b border-slate-600 bg-transparent text-slate-300 text-sm focus:outline-none focus:border-primary-500"
+                                        className="w-full px-0 py-2 border-b border-slate-300 bg-transparent text-slate-900 text-sm focus:outline-none focus:border-indigo-500"
                                     />
                                 </div>
 
                                 {/* Email */}
                                 <div className="mb-6">
-                                    <label className="block text-sm font-semibold text-white mb-2">
+                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
                                         Email <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="email"
                                         value={user?.email || "sachinrio74@gmail.com"}
                                         readOnly
-                                        className="w-full px-0 py-2 border-b border-slate-600 bg-transparent text-slate-300 text-sm focus:outline-none focus:border-primary-500"
+                                        className="w-full px-0 py-2 border-b border-slate-300 bg-transparent text-slate-900 text-sm focus:outline-none focus:border-indigo-500"
                                     />
                                 </div>
 
                                 {/* Delivery Method */}
                                 <div className="mb-6">
-                                    <label className="block text-sm font-semibold text-white mb-2">
+                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
                                         Delivery Method
                                     </label>
                                     <input
                                         type="text"
                                         value="eTicket"
                                         readOnly
-                                        className="w-full px-0 py-2 border-b border-slate-600 bg-transparent text-slate-300 text-sm focus:outline-none focus:border-primary-500"
+                                        className="w-full px-0 py-2 border-b border-slate-300 bg-transparent text-slate-900 text-sm focus:outline-none focus:border-indigo-500"
                                     />
                                 </div>
                             </div>
@@ -356,7 +348,7 @@ export default function EventTicketPage({ eventId, onNavigate, onCancelSuccess, 
                             <div className="mt-8">
                                 <button
                                     onClick={() => onNavigate('my-registrations')}
-                                    className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition"
+                                    className="px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold transition active:scale-[0.98]"
                                 >
                                     ← Back to My Registrations
                                 </button>

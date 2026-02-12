@@ -78,6 +78,22 @@ body {
   }
 }
 
+@keyframes float-v {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+.animate-float-v {
+  animation: float-v 5s ease-in-out infinite;
+}
+
 .floating-orb {
   animation: float 20s infinite ease-in-out;
 }

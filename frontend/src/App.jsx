@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import LandingPage from './components/LandingPage';
-import EventFeed from './components/EventFeed';
 import AuthPage from './components/AuthPage';
 import Dashboard from './components/Dashboard';
 import CreateEventPage from './components/CreateEventPage';
@@ -19,6 +18,7 @@ export default function App() {
   const [checkInEventId, setCheckInEventId] = useState(null);
   const [initialDashboardView, setInitialDashboardView] = useState(null);
   const [initialDashboardEventId, setInitialDashboardEventId] = useState(null);
+  const [initialSearchQuery, setInitialSearchQuery] = useState("");
 
   // View State: 'landing' or 'feed' or 'auth' or 'dashboard'
   const [currentView, setCurrentView] = useState('landing');
@@ -47,13 +47,16 @@ export default function App() {
 
   const fetchEvents = async () => {
     try {
-      const res = await fetch('/api/v1/events');
+      const res = await fetch('/api/v1/events?limit=100');
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
+      console.log("App: fetchEvents data:", data); // DEBUG
       // Handle new API structure { data: [], total: ... }
       if (data && Array.isArray(data.data)) {
+        console.log("App: Setting events from data.data, length:", data.data.length); // DEBUG
         setEvents(data.data);
       } else if (Array.isArray(data)) {
+        console.log("App: Setting events from data array, length:", data.length); // DEBUG
         setEvents(data);
       } else {
         setEvents([]);
@@ -161,9 +164,9 @@ export default function App() {
         <LandingPage
           events={events}
           user={user}
-          onNavigate={() => {
+          onNavigate={(view, params) => {
             window.scrollTo(0, 0);
-            setCurrentView('feed');
+            setCurrentView(view);
           }}
           onLogin={() => {
             if (user) {
@@ -184,17 +187,7 @@ export default function App() {
         />
       )}
 
-      {currentView === 'feed' && (
-        <EventFeed
-          events={events}
-          loading={loading}
-          error={error}
-          onBack={() => {
-            window.scrollTo(0, 0);
-            setCurrentView('landing');
-          }}
-        />
-      )}
+
 
       {currentView === 'auth' && (
         <AuthPage
