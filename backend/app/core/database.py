@@ -13,7 +13,7 @@ if not DATABASE_URL:
     print("Database URL not found, checking for platform-specific defaults...")
     if os.getenv("RENDER"):
         print("Running on Render, using internal database URL")
-        DATABASE_URL = "postgresql+asyncpg://infinitetechai:yoYZCSBWQTuY6DNfPObCYyAQpi3itQQH@dpg-d670ql86fj8s7380oobg-a/infinitetechai_lq9g"
+        DATABASE_URL = "postgresql+asyncpg://infinitetechai:g1ycmCmCWLIHQhW7lwe8di70DuDopUWj@dpg-d671ds8boq4c73asch2g-a/infinitetechai_97nv"
     else:
         print("Running locally, using localhost")
         DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/infinite_bz"
