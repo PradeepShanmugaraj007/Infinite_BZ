@@ -153,8 +153,20 @@ async def scrape_events_playwright(city: str = "chennai", category: str = "busin
         try:
             await page.goto(search_url, timeout=120000)
             
+            # --- DEBUG: Check for Blocking ---
+            page_title = await page.title()
+            print(f"Scraper: Page Title -> {page_title}")
+            if any(k in page_title for k in ["Access Denied", "Just a moment", "Captcha", "Security", "Cloudflare"]):
+                 print("CRITICAL: Scraper blocked by anti-bot protection.")
+            
             # Wait for event cards
-            await page.wait_for_selector("div.event-card__details, section.event-card-details", timeout=15000)
+            try:
+                await page.wait_for_selector("div.event-card__details, section.event-card-details", timeout=20000)
+            except Exception as e:
+                print(f"Timeout waiting for selectors. Dumping HTML snippet...")
+                content = await page.content()
+                print(f"HTML Snippet: {content[:1000]}")
+                raise e
             
             # Scroll more to trigger lazy loading of images
             for _ in range(5):
