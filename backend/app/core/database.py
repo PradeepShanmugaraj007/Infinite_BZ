@@ -23,7 +23,7 @@ elif DATABASE_URL and DATABASE_URL.startswith("postgresql://"):
 
 # Fix for Render/Neon SSL issues
 connect_args = {}
-if "render.com" in DATABASE_URL or "neon.tech" in DATABASE_URL:
+if "render.com" in DATABASE_URL or "neon.tech" in DATABASE_URL or "dpg-" in DATABASE_URL:
     connect_args = {"ssl": "require"}
 
 engine = create_async_engine(DATABASE_URL, echo=False, future=True, connect_args=connect_args)
