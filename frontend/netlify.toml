@@ -4,18 +4,20 @@
 
 [[redirects]]
   from = "/*"
-  to = "/index.html"
-  status = 200
-
-
 # Set environment variables for the build
 [build.environment]
   NPM_FLAGS = "--legacy-peer-deps"
   CI = "false" 
 
-# Placeholder for API proxy - Updated to User's Deployed Backend
+# API Proxy - MUST BE BEFORE SPA FALLBACK
 [[redirects]]
   from = "/api/*"
   to = "https://project1-kmm5.onrender.com/api/:splat"
   status = 200
   force = true
+
+# SPA Fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
