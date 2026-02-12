@@ -17,14 +17,14 @@ export const AIInsights = () => {
                 model: 'gemini-3-flash-preview',
                 contents: "Give me one sharp, ultra-specific business opportunity in Chennai this week. Mention a specific hub like OMR, Guindy, or ECR. Max 25 words.",
                 config: {
-                    systemInstruction: "You are 'Infinite Oracle', a high-end business AI for Chennai's elite. You provide high-signal, zero-noise insights.",
+                    systemInstruction: "You are 'Infinite BZ AI', the premier intelligence engine for Chennai's business ecosystem. You provide exclusive, high-value, and actionable market insights for founders and investors.",
                     temperature: 0.9,
                     topK: 1
                 }
             });
-            setInsight(response.text || "SaaS startups at OMR are looking for early B2B pilots. Reach out to the Fintech hub for direct CTO intros.");
+            setInsight(response.text || "Deep-tech founders in Guindy are seeking seed capital. Connect with the Industrial Corridor node for early access.");
         } catch (error) {
-            setInsight("The OMR tech corridor is experiencing a spike in AI-focused networking events. Position for Q4 capital.");
+            setInsight("SaaS valuations in Chennai's OMR belt are trending up. Focus on B2B AI vertical integrations for maximum investor interest.");
         } finally {
             setIsLoading(false);
         }
@@ -59,7 +59,7 @@ export const AIInsights = () => {
                             <svg className="w-7 h-7 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                         </div>
                         <div>
-                            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500 mb-1">Oracle AI</h4>
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500 mb-1">Infinite BZ AI</h4>
                             <h3 className="text-xl font-black text-slate-900 tracking-tight">Daily Alpha</h3>
                         </div>
                     </div>

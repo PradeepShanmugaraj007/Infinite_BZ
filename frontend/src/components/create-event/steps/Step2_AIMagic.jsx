@@ -27,11 +27,10 @@ export default function Step2_AIMagic({ formData, updateFormData, onNext, onBack
             };
 
             // Assuming Vite proxy or absolute URL. Using absolute for clarity based on existing code.
-            const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/v1/ai/generate-event`, {
+            const response = await fetch('/api/v1/ai/generate-event', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // Add auth token if needed, though mostly public or protected
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
                 body: JSON.stringify(payload)

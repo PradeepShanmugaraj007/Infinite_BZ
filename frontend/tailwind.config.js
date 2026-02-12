@@ -40,7 +40,11 @@ export default {
                     500: '#06b6d4',
                     600: '#0891b2',
                 }
-            }
+            },
+            fontFamily: {
+                sans: ['Inter', 'sans-serif'],
+                outfit: ['Outfit', 'sans-serif'],
+            },
         },
     },
     plugins: [],

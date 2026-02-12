@@ -384,6 +384,30 @@ async def list_events(
     
     # Base query for filtering
     filter_query = select(Event)
+
+    # Smart Keyword Detection from Search String
+    if search:
+        import re
+        s_lower = search.lower()
+        if "free" in s_lower:
+            is_free = "free"
+            search = re.sub(r'\bfree\b', '', search, flags=re.IGNORECASE).strip()
+        elif "paid" in s_lower:
+            is_free = "paid"
+            search = re.sub(r'\bpaid\b', '', search, flags=re.IGNORECASE).strip()
+        
+        s_lower = search.lower()
+        if "online" in s_lower:
+            mode = "online"
+            search = re.sub(r'\bonline\b', '', search, flags=re.IGNORECASE).strip()
+        elif "offline" in s_lower:
+            mode = "offline"
+            search = re.sub(r'\boffline\b', '', search, flags=re.IGNORECASE).strip()
+
+        s_lower = search.lower()
+        if "chennai" in s_lower:
+            city = "chennai"
+            search = re.sub(r'\bchennai\b', '', search, flags=re.IGNORECASE).strip()
     
     # 0. Category/Industry Filter (Keyword Search)
     if category and category.lower() != "all":

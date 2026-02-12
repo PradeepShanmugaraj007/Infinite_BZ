@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import CheckoutModal from './CheckoutModal';
 
-export default function EventDetailModal({ event, isOpen, onClose, onRegister, isRegistered }) {
+export default function EventDetailModal({ event, isOpen, onClose, onRegister, isRegistered, user, onLogin }) {
     if (!isOpen || !event) return null;
 
     const [activeTab, setActiveTab] = useState('about');
@@ -277,6 +277,10 @@ export default function EventDetailModal({ event, isOpen, onClose, onRegister, i
                                 <div className="p-6 bg-slate-800/50 rounded-2xl border border-slate-700/50 space-y-4">
                                     <button
                                         onClick={() => {
+                                            if (!user) {
+                                                onLogin();
+                                                return;
+                                            }
                                             if (!isRegistered) {
                                                 setShowCheckout(true);
                                             }
@@ -393,7 +397,15 @@ export default function EventDetailModal({ event, isOpen, onClose, onRegister, i
                                 </div>
 
                                 <button
-                                    onClick={() => !isRegistered && setShowCheckout(true)}
+                                    onClick={() => {
+                                        if (!user) {
+                                            onLogin();
+                                            return;
+                                        }
+                                        if (!isRegistered) {
+                                            setShowCheckout(true);
+                                        }
+                                    }}
                                     disabled={isRegistered}
                                     className={`px-10 py-4 rounded-xl font-bold text-lg flex items-center gap-3 transition-all transform hover:-translate-y-1 ${isRegistered
                                         ? 'bg-green-500/20 text-green-400 cursor-default'

@@ -22,9 +22,9 @@ const AnimatedText = ({ text, baseDelay = 0, className = "", useGradient = false
     );
 };
 
-export const Hero = ({ events = [] }) => {
+export const Hero = ({ events = [], onLogin, onExplore }) => {
     return (
-        <section className="relative pt-32 pb-24 overflow-hidden">
+        <section className="relative pt-2 pb-10">
             <MouseSpotlight />
             <ThreeBackground />
 
@@ -35,35 +35,60 @@ export const Hero = ({ events = [] }) => {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="max-w-4xl mx-auto text-center mb-16">
-                    <div className="inline-flex items-center gap-3 bg-white shadow-xl border border-slate-100 px-5 py-2 rounded-full mb-8 transition-transform hover:scale-105 reveal">
-                        <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-                        </span>
-                        <span className="text-slate-500 text-[10px] font-black uppercase tracking-[0.25em]">Chennai Professional Hub</span>
-                    </div>
+
 
                     {/* Hero Video - Seamless Integration */}
-                    <div className="relative w-full max-w-4xl mx-auto mb-0 reveal group" style={{ animationDelay: '0.2s' }}>
-                        {/* The Glowing Backdrop */}
-                        <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-[2rem] blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-
-                        {/* The Video Player Container */}
-                        <div className="relative rounded-[1.8rem] shadow-2xl overflow-hidden bg-[#fdfdff] border border-white/20">
+                    <div className="relative w-full max-w-2xl mx-auto mb-0 mt-4 group">
+                        {/* Sticker: Left of Video - Maximized Size & Repositioned for Smaller Video */}
+                        <div className="hidden md:block absolute -left-[35rem] top-[20%] -translate-y-1/2 w-[55rem] animate-float-v z-20 pointer-events-none">
+                            <img src="/media/left-float-gemini.png" alt="Sticker Left" className="w-full h-auto drop-shadow-xl rotate-[-6deg]" />
+                        </div>
+                        {/* Sticker: Right of Video - Maximized Size & Repositioned for Smaller Video */}
+                        <div className="hidden md:block absolute -right-[35rem] top-[20%] -translate-y-1/2 w-[55rem] animate-float-v z-20 pointer-events-none">
+                            <img src="/media/right-float-gemini.png" alt="Sticker Right" className="w-full h-auto drop-shadow-xl rotate-[6deg]" />
+                        </div>
+                        {/* Video Layer Container */}
+                        <div className="relative rounded-[1.2rem] shadow-2xl overflow-hidden bg-[#fdfdff] border border-white/20 aspect-video w-full">
                             <video
                                 autoPlay
                                 loop
                                 muted
                                 playsInline
-                                className="w-full h-auto mix-blend-multiply dark:mix-blend-normal"
+                                preload="auto"
+                                onTimeUpdate={(e) => {
+                                    const time = e.target.currentTime;
+                                    const overlay = document.getElementById('video-overlay-text');
+                                    if (overlay) {
+                                        if (time >= 0.07 && time <= 3.0) {
+                                            overlay.style.opacity = '1';
+                                            overlay.style.transform = 'scale(1)';
+                                        } else {
+                                            overlay.style.opacity = '0';
+                                            overlay.style.transform = 'scale(0.95)';
+                                        }
+                                    }
+                                }}
+                                className="w-full h-full object-cover aspect-video mix-blend-multiply dark:mix-blend-normal"
                             >
                                 <source src="/hero-video-radial.mp4" type="video/mp4" />
                                 Your browser does not support the video tag.
                             </video>
+
+                            {/* Timed Overlay Text - Centered & Transparent Background */}
+                            <div
+                                id="video-overlay-text"
+                                className="absolute inset-0 flex items-center justify-center px-6 opacity-0 scale-[0.95] transition-all duration-300 ease-out z-30 pointer-events-none"
+                            >
+                                <div className="text-center">
+                                    <p className="text-xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+                                        Creating <span className="text-indigo-600">boundless</span> networking opportunities for everyone
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <h1 className="text-5xl md:text-8xl font-black text-slate-900 mb-8 leading-[1.2] tracking-tight relative z-20" style={{ perspective: '1200px' }}>
+                    <h1 className="text-3xl md:text-6xl font-black text-slate-900 mb-8 leading-[1.2] tracking-tight relative z-20" style={{ perspective: '1200px' }}>
                         <AnimatedText text="Discovery for the" baseDelay={0.2} className="block" />
 
                         {/* Replaced static Infinite Minded with Cycling Text */}
@@ -72,16 +97,19 @@ export const Hero = ({ events = [] }) => {
                         </div>
                     </h1>
 
-                    <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed reveal" style={{ animationDelay: '1.8s' }}>
-                        Unite with 12,000+ top-tier founders and investors. The definitive gateway to South India's business evolution.
+                    <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed">
+                        Connect with Chennai’s most dynamic network of innovators. The ultimate gateway to business growth, strategic partnerships, and infinite opportunities.
                     </p>
                 </div>
 
                 {/* CTA Buttons with Magnetic Effect */}
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-6 reveal relative z-20" style={{ animationDelay: '2.2s' }}>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-6 relative z-20">
                     <MagneticButton strength={40}>
-                        <button className="bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-bold px-10 py-4 rounded-xl shadow-lg shadow-indigo-200 transition-all hover:scale-105 btn-bounce flex items-center gap-2 group">
-                            Join Hub
+                        <button
+                            onClick={onLogin}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-bold px-10 py-4 rounded-xl shadow-lg shadow-indigo-200 transition-all hover:scale-105 btn-bounce flex items-center gap-2 group"
+                        >
+                            Login Hub
                             <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                             </svg>
@@ -89,15 +117,38 @@ export const Hero = ({ events = [] }) => {
                     </MagneticButton>
 
                     <MagneticButton strength={40}>
-                        <button className="bg-white text-slate-700 hover:text-indigo-600 text-lg font-bold px-10 py-4 rounded-xl border border-slate-200 hover:border-indigo-100 shadow-sm hover:shadow-md transition-all hover:scale-105 btn-bounce">
+                        <button
+                            onClick={onExplore}
+                            className="bg-white text-slate-700 hover:text-indigo-600 text-lg font-bold px-10 py-4 rounded-xl border border-slate-200 hover:border-indigo-100 shadow-sm hover:shadow-md transition-all hover:scale-105 btn-bounce"
+                        >
                             Explore Events
                         </button>
                     </MagneticButton>
                 </div>
 
-                {/* Logo Marquee */}
-                <div className="mt-20 pt-8 border-t border-slate-100 reveal relative z-10" style={{ animationDelay: '2.5s' }}>
+                {/* Logo Marquee & Bottom Floating Images */}
+                <div className="mt-10 pt-8 border-t border-slate-100 relative z-10">
                     <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mb-8">Aggregated from Top Sources</p>
+
+
+
+                    {/* ORIGINAL Bottom Floating Images - Marquee Level */}
+                    <div className="hidden xl:block absolute -left-10 -bottom-60 w-[24rem] animate-float-v z-20 pointer-events-none" style={{ animationDelay: '1s' }}>
+                        <img
+                            src="/media/left-float-hq.png"
+                            alt="Business Growth"
+                            className="w-full h-auto drop-shadow-2xl"
+                        />
+                    </div>
+
+                    <div className="hidden xl:block absolute -right-8 -bottom-60 w-[24rem] animate-float-v z-20 pointer-events-none" style={{ animationDelay: '2.5s' }}>
+                        <img
+                            src="/media/right-float-hq.png"
+                            alt="Deal Signed"
+                            className="w-full h-auto drop-shadow-2xl"
+                        />
+                    </div>
+
                     <LogoMarquee events={events} />
                 </div>
             </div>

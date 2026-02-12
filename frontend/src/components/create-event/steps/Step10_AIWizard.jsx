@@ -39,7 +39,7 @@ export default function Step10_AIWizard({ formData, updateFormData, onNext }) {
                 end_time: formData.endTime || "12:00"
             };
 
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/ai/generate-event`, {
+            const response = await fetch('/api/v1/ai/generate-event', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -148,7 +148,7 @@ export default function Step10_AIWizard({ formData, updateFormData, onNext }) {
                 <h3 className="text-2xl font-bold text-white">Where is it located?</h3>
 
                 <div className="bg-white/5 p-6 rounded-2xl border border-white/10 space-y-6">
-                    <div className="flex gap-4 p-1 bg-slate-900 rounded-xl w-fit">
+                    <div className="flex gap-4 p-1 bg-white/5 rounded-xl w-fit border border-white/10">
                         <button
                             onClick={() => updateFormData({ mode: 'offline' })}
                             className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${formData.mode === 'offline' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}

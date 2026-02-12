@@ -58,7 +58,7 @@ const TiltCard = ({ category, index }) => {
                 <div className="text-center">
                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-800 block mb-1 group-hover:text-indigo-900">{category.name}</span>
                     <span className="text-[9px] font-bold text-slate-500 bg-white/50 px-2 py-0.5 rounded-full backdrop-blur-sm group-hover:bg-white/80 group-hover:text-indigo-600 transition-colors">
-                        {category.eventCount} Apps
+                        {category.eventCount} Events
                     </span>
                 </div>
             </div>
@@ -67,14 +67,71 @@ const TiltCard = ({ category, index }) => {
 };
 
 const DEFAULT_CATEGORIES = [
-    { name: 'SaaS', eventCount: 42, icon: 'cloud' },
-    { name: 'Invest', eventCount: 30, icon: 'trending-up' },
-    { name: 'Founders', eventCount: 18, icon: 'users' },
-    { name: 'Capital', eventCount: 25, icon: 'pie-chart' },
-    { name: 'Web3', eventCount: 12, icon: 'cube' },
-    { name: 'HR Tech', eventCount: 8, icon: 'user-group' },
-    { name: 'Fintech', eventCount: 15, icon: 'credit-card' },
+    { name: 'SaaS', eventCount: 0, icon: 'cloud' },
+    { name: 'Invest', eventCount: 0, icon: 'trending-up' },
+    { name: 'Founders', eventCount: 0, icon: 'users' },
+    { name: 'Capital', eventCount: 0, icon: 'pie-chart' },
+    { name: 'Web3', eventCount: 0, icon: 'cube' },
+    { name: 'HR Tech', eventCount: 0, icon: 'user-group' },
+    { name: 'Fintech', eventCount: 0, icon: 'credit-card' },
 ];
+
+const CATEGORY_KEYWORDS = {
+    'saas': [
+        { word: 'saas', weight: 3 }, { word: 'software', weight: 1 }, { word: 'cloud', weight: 2 },
+        { word: 'ai', weight: 2 }, { word: 'platform', weight: 1 }, { word: 'tech', weight: 1 }
+    ],
+    'invest': [
+        { word: 'invest', weight: 5 }, { word: 'angel', weight: 5 }, { word: 'venture', weight: 5 },
+        { word: 'funding', weight: 5 }, { word: 'equity', weight: 5 }, { word: 'capital', weight: 4 },
+        { word: 'seed', weight: 4 }, { word: 'raise', weight: 4 }, { word: 'fund', weight: 4 },
+        { word: 'vc', weight: 5 }, { word: 'valuation', weight: 3 }
+    ],
+    'founders': [
+        { word: 'founder', weight: 2 }, { word: 'entrepreneur', weight: 2 }, { word: 'startup', weight: 1 },
+        { word: 'pitch', weight: 2 }, { word: 'launch', weight: 1 }, { word: 'networking', weight: 1 }
+    ],
+    'capital': [
+        { word: 'finance', weight: 2 }, { word: 'money', weight: 1 }, { word: 'growth', weight: 1 },
+        { word: 'profit', weight: 1 }, { word: 'economy', weight: 1 }
+    ],
+    'web3': [
+        { word: 'web3', weight: 5 }, { word: 'crypto', weight: 4 }, { word: 'blockchain', weight: 4 },
+        { word: 'nft', weight: 4 }, { word: 'defi', weight: 4 }
+    ],
+    'hr tech': [
+        { word: 'hr', weight: 4 }, { word: 'recruitment', weight: 3 }, { word: 'hiring', weight: 3 },
+        { word: 'talent', weight: 2 }, { word: 'culture', weight: 1 }
+    ],
+    'fintech': [
+        { word: 'fintech', weight: 5 }, { word: 'banking', weight: 3 }, { word: 'payment', weight: 3 },
+        { word: 'wallet', weight: 2 }, { word: 'insurance', weight: 2 }
+    ],
+};
+
+const detectCategory = (event) => {
+    const text = `${event.title} ${event.description || ''} ${event.category || ''}`.toLowerCase();
+
+    let bestMatch = null;
+    let maxScore = 0;
+
+    for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+        let score = 0;
+        keywords.forEach(({ word, weight }) => {
+            if (text.includes(word)) score += weight;
+        });
+
+        // Use >= to allow overwriting if equal (later categories in obj might take precedence? No, order is keys)
+        // Strictly > means first match wins ties.
+        if (score > maxScore) {
+            maxScore = score;
+            bestMatch = cat;
+        }
+    }
+
+    // Default to 'Founders' if no strong match, or keep original if valid
+    return bestMatch ? bestMatch : (event.category || 'Founders').toLowerCase();
+};
 
 export const CategoriesGrid = ({ events = [] }) => {
     // Derive categories from events, but keep defaults as baseline
@@ -88,19 +145,19 @@ export const CategoriesGrid = ({ events = [] }) => {
         // 2. Process real events
         if (events && events.length > 0) {
             events.forEach(event => {
-                const catName = event.category || 'Business';
+                const catName = detectCategory(event);
                 const key = catName.toLowerCase();
 
                 // If exists (even as default), increment count. 
-                // Note: For defaults, we might want to just ADD to the mock count or replace it.
-                // Let's just increment to show "aliveness" on top of baseline.
                 if (catMap.has(key)) {
                     const existing = catMap.get(key);
                     existing.eventCount = (existing.eventCount || 0) + 1;
                 } else {
                     // New category from DB
+                    // Capitalize first letter for display
+                    const displayName = catName.charAt(0).toUpperCase() + catName.slice(1);
                     catMap.set(key, {
-                        name: catName,
+                        name: displayName,
                         eventCount: 1,
                         icon: getIconForCategory(catName)
                     });
@@ -116,7 +173,7 @@ export const CategoriesGrid = ({ events = [] }) => {
     }, [events]);
 
     return (
-        <div className="flex gap-8 overflow-x-auto no-scrollbar py-12 px-4 -mx-4 pb-20 perspective-2000">
+        <div className="flex gap-8 overflow-x-auto no-scrollbar py-4 px-4 -mx-4 pb-6 perspective-2000">
             {categories.map((cat, idx) => (
                 <TiltCard key={cat.id} category={cat} index={idx} />
             ))}
