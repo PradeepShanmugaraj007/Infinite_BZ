@@ -200,7 +200,8 @@ class AIGeneratorService:
                     print("DDG returned no results.")
 
         except Exception as e:
-            print(f"DDG Image Search Failed (likely blocked): {e}")
+            # Catch library-internal errors like timedelta formatting in newer versions
+            print(f"DDG Image Search Failed (Error: {e})")
 
         # --- Fallback: Unsplash Curated List ---
         print("Using Unsplash Fallback...")
