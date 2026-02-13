@@ -125,7 +125,7 @@ def fetch_event_details_api(event_id: str, fallback_image: str = None) -> Option
         print(f"Exception fetching API for {event_id}: {e}")
         return None
 
-async def scrape_events_playwright(city: str = "chennai", category: str = "business--events") -> List[Dict]:
+async def scrape_events_playwright(city: str = "chennai", category: str = "business") -> List[Dict]:
     """
     Scrapes Eventbrite Search to find Event IDs, then utilizes the Eventbrite API
     to fetch accurate details for each event.
@@ -135,7 +135,8 @@ async def scrape_events_playwright(city: str = "chennai", category: str = "busin
     
     # Construct Search URL
     encoded_city = urllib.parse.quote(city)
-    search_url = f"{BASE_URL}/d/india--{encoded_city}/{category}/"
+    # User requested: https://www.eventbrite.com/b/india--chennai/business/
+    search_url = f"{BASE_URL}/b/india--{encoded_city}/{category}/"
     
     print(f"Scraper: Starting Playwright session for {search_url}...")
 
