@@ -61,6 +61,11 @@ class AIGeneratorService:
         # 2. Initialize EasyOCR for text detection (CNN)
         print("Initializing EasyOCR (this may take a moment)...")
         try:
+            # Skip EasyOCR on Render Free Tier to save memory (avoid OOM)
+            if os.getenv("RENDER"):
+                print("Running on Render: Disabling EasyOCR to save memory.")
+                raise ImportError("Disabled on Render")
+
             import easyocr
             # 'en' for English. gpu=False to be safe on standard servers, true if CUDA avail.
             # Using CPU to avoid CUDA dependency hell for now unless user asked for GPU.
