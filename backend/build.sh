@@ -9,4 +9,4 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 # Install Playwright browsers (Chromium only)
-playwright install chromium
+# playwright install chromium # DISABLED: Causes "su: Authentication failure" on Render. Using runtime self-healing instead.
