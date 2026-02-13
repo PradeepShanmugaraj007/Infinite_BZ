@@ -28,6 +28,11 @@ async def trigger_refresh():
     # Pass current environment + PYTHONPATH to ensure imports work
     env = os.environ.copy()
     env["PYTHONPATH"] = project_root # Ensure backend root is in python path
+    
+    # Point Playwright to the local browser folder created by build.sh
+    # project_root is .../backend
+    env["PLAYWRIGHT_BROWSERS_PATH"] = os.path.join(project_root, "pw-browsers")
+    print(f"API: Configured PLAYWRIGHT_BROWSERS_PATH={env['PLAYWRIGHT_BROWSERS_PATH']}")
 
     # Spawn subprocess letting it inherit stdout/stderr (so logs show in Render Dashboard)
     subprocess.Popen(
