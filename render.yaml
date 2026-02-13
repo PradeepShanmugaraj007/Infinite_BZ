@@ -1,12 +1,11 @@
 services:
   - type: web
-    name: infinite-bz-backend
+    name: infinitbiz
     env: docker
+    dockerfilePath: ./Dockerfile
     plan: starter
     region: ohio
     branch: main
-    dockerContext: .
-    dockerfilePath: Dockerfile
     envVars:
       - key: DATABASE_URL
         fromDatabase:
