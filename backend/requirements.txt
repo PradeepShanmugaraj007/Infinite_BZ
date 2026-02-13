@@ -44,6 +44,7 @@ certifi==2025.11.12
 
 # AI & GenAI
 openai==1.12.0
+langchain>=0.1.0
 langchain-core==0.1.23
 langchain-google-genai==0.0.9
 langchain-groq==0.0.1
