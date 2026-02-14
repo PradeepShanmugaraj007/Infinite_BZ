@@ -179,44 +179,59 @@ class AIGeneratorService:
 
     async def _search_image(self, query: str) -> Optional[str]:
         """
-        1. Searches DuckDuckGo for candidate images.
-        2. Uses Gemini Vision to filter out images with text/watermarks.
-        3. Returns the first 'clean' image.
+        Multi-source search strategy:
+        1. DuckDuckGo (General)
+        2. Unsplash (Dynamic Search via DDG)
+        3. Curated Fallback
+        All results are filtered by Gemini Vision.
         """
+        # --- Source 1: DuckDuckGo General ---
         try:
             from duckduckgo_search import DDGS
-            
-            # Use title + 'event' for a clean, related search
             search_query = f"{query} event"
-            print(f"Attempting DDG Search (Vision Filter) for: {search_query}")
+            print(f"Attempting Source 1 (DDG): {search_query}")
             
             with DDGS() as ddgs:
                 results = list(ddgs.images(
                     keywords=search_query,
                     region="wt-wt",
                     safesearch="off",
-                    max_results=8 # Get extra to allow for filtering
+                    max_results=8
                 ))
                 
-                if results and len(results) > 0:
-                     # Check top 5 for text
-                     for res in results[:5]:
-                         img_url = res['image']
-                         print(f"Vision Checking candidate image: {img_url}")
-                         if await self._is_image_clean(img_url):
-                             print(f"DDG Success (Clean Image Found): {img_url}")
-                             return img_url
-                         else:
-                             print(f"Skipping candidate image with text: {img_url}")
-                     
-                     # If none of top were clean, return first as final resort
-                     print("No 100% clean images found in top results. Using first candidate.")
-                     return results[0]['image']
-
+                if results:
+                    for res in results[:5]:
+                        img_url = res['image']
+                        if await self._is_image_clean(img_url):
+                            print(f"DDG Success (Clean): {img_url}")
+                            return img_url
         except Exception as e:
-            print(f"DDG Image Search Failed: {e}")
+            print(f"DDG Source 1 Failed: {e}")
 
-        # Fallback to curated list
+        # --- Source 2: Unsplash Dynamic Search (via DDG) ---
+        try:
+            from duckduckgo_search import DDGS
+            # Force search results from Unsplash for high quality event photos
+            unsplash_query = f"site:unsplash.com {query} professional event"
+            print(f"Attempting Source 2 (Unsplash via DDG): {unsplash_query}")
+            
+            with DDGS() as ddgs:
+                results = list(ddgs.images(
+                    keywords=unsplash_query,
+                    max_results=5
+                ))
+                
+                if results:
+                    for res in results:
+                        img_url = res['image']
+                        if await self._is_image_clean(img_url):
+                            print(f"Unsplash Search Success (Clean): {img_url}")
+                            return img_url
+        except Exception as e:
+            print(f"Unsplash Source 2 Failed: {e}")
+
+        # --- Source 3: Curated Fallbacks ---
+        print("All dynamic searches failed or results were 'busy'. Using curated fallback.")
         fallbacks = [
             "https://images.unsplash.com/photo-1540575861501-7ad05823c9f5?auto=format&fit=crop&w=1000&q=80",
             "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80",
