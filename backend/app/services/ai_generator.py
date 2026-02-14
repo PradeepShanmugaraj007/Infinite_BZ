@@ -25,7 +25,7 @@ class AIGeneratorService:
     def __init__(self):
         # 1. Initialize LLMs
         self.google_api_key = os.getenv("GOOGLE_API_KEY")
-        self.google_model_name = os.getenv("GOOGLE_MODEL_NAME", "gemini-2.5-flash")
+        self.google_model_name = os.getenv("GOOGLE_MODEL_NAME", "gemini-1.5-flash")
         
         self.groq_api_key = os.getenv("GROQ_API_KEY")
         self.groq_model_name = "llama-3.3-70b-versatile"
@@ -152,7 +152,7 @@ class AIGeneratorService:
             
             if search_term:
                 print(f"Searching for image using: {search_term}")
-                image_url = self._search_image(search_term)
+                image_url = await self._search_image(search_term)
                 if image_url:
                     result["imageUrl"] = image_url
                     print(f"Image found: {result['imageUrl']}")
@@ -160,7 +160,7 @@ class AIGeneratorService:
                     # Fallback to title if detailed prompt finds nothing
                     if search_term != title:
                         print(f"No image found for prompt, retrying with title: {title}")
-                        image_url = self._search_image(title)
+                        image_url = await self._search_image(title)
                         if image_url:
                             result["imageUrl"] = image_url
                         else:
@@ -177,43 +177,46 @@ class AIGeneratorService:
             # Even if image fails, return the text content we hopefully have
             return result
 
-    def _search_image(self, query: str) -> Optional[str]:
+    async def _search_image(self, query: str) -> Optional[str]:
         """
-        Searches DuckDuckGo for images (Primary). 
-        Falls back to curated Unsplash images if blocked/failed.
+        1. Searches DuckDuckGo for candidate images.
+        2. Uses Gemini Vision to filter out images with text/watermarks.
+        3. Returns the first 'clean' image.
         """
         try:
             from duckduckgo_search import DDGS
             
             # Use title + 'event' for a clean, related search
             search_query = f"{query} event"
-            print(f"Attempting DDG Search for: {search_query}")
+            print(f"Attempting DDG Search (Vision Filter) for: {search_query}")
             
             with DDGS() as ddgs:
                 results = list(ddgs.images(
                     keywords=search_query,
                     region="wt-wt",
                     safesearch="off",
-                    max_results=5
+                    max_results=8 # Get extra to allow for filtering
                 ))
                 
                 if results and len(results) > 0:
-                     # Pick the first result for maximum relevance
-                     image_url = results[0]['image']
-                     print(f"DDG Success: {image_url}")
-                     return image_url
-                else:
-                    # Retry with simpler query
-                    print(f"DDG no results for '{search_query}', retrying simple title...")
-                    with DDGS() as ddgs:
-                        retry = list(ddgs.images(keywords=query, max_results=3))
-                        if retry: 
-                            print(f"DDG Retry Success: {retry[0]['image']}")
-                            return retry[0]['image']
-        except Exception as e:
-            print(f"DDG Search Failed: {e}")
+                     # Check top 5 for text
+                     for res in results[:5]:
+                         img_url = res['image']
+                         print(f"Vision Checking candidate image: {img_url}")
+                         if await self._is_image_clean(img_url):
+                             print(f"DDG Success (Clean Image Found): {img_url}")
+                             return img_url
+                         else:
+                             print(f"Skipping candidate image with text: {img_url}")
+                     
+                     # If none of top were clean, return first as final resort
+                     print("No 100% clean images found in top results. Using first candidate.")
+                     return results[0]['image']
 
-        # Curated fallbacks
+        except Exception as e:
+            print(f"DDG Image Search Failed: {e}")
+
+        # Fallback to curated list
         fallbacks = [
             "https://images.unsplash.com/photo-1540575861501-7ad05823c9f5?auto=format&fit=crop&w=1000&q=80",
             "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80",
@@ -221,39 +224,25 @@ class AIGeneratorService:
         ]
         return random.choice(fallbacks)
 
-
-
-    def _has_text(self, image_url: str) -> bool:
-        """
-        Downloads image and checks for text using EasyOCR.
-        Returns True if text is detected.
-        """
+    async def _is_image_clean(self, image_url: str) -> bool:
+        """Uses Gemini Vision to detect if an image is suitable (no text/logos)."""
+        if not self.llm_google:
+            return True
         try:
-            import requests
-            
-            # Download image with timeout
-            response = requests.get(image_url, timeout=5)
-            if response.status_code != 200:
-                print(f"Failed to download image for OCR: {response.status_code}")
-                return True # Treat as "bad" to skip it
-            
-            image_bytes = response.content
-            
-            # Run OCR
-            # detail=0 returns just the text strings found
-            result = self.reader.readtext(image_bytes, detail=0)
-            
-            # If result list is not empty, text was found
-            if len(result) > 0:
-                print(f"Text detected: {result}")
-                return True
-            
-            return False
-
+            from langchain_core.messages import HumanMessage
+            # Vision prompt
+            message = HumanMessage(
+                content=[
+                    {"type": "text", "text": "Does this image contain any significant text, logos, or watermarks? Answer ONLY 'YES' or 'NO'."},
+                    {"type": "image_url", "image_url": {"url": image_url}},
+                ]
+            )
+            response = await self.llm_google.ainvoke([message])
+            decision = response.content.strip().upper()
+            return "NO" in decision
         except Exception as e:
-            print(f"OCR check failed: {e}")
-            return True # conservative: if lookup fails, assume bad to skip
-
+            print(f"Gemini Vision check failed for {image_url}: {e}")
+            return True # Conservative: use it if check fails
 
 
     def _clean_description(self, text: str) -> str:
