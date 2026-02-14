@@ -178,16 +178,27 @@ class AIGeneratorService:
 
     def _search_image(self, query: str) -> Optional[str]:
         """
-        Searches DuckDuckGo for images. 
-        Falls back to curated Unsplash images if blocked/failed.
+        1. Attempts to generate a high-relevance image via Pollinations.ai
+        2. Falls back to DuckDuckGo Search
+        3. Falls back to a dynamic Unsplash keyword URL
         """
-        image_url = None
+        import urllib.parse
+        
+        # --- 1. Generative AI (Pollinations.ai) ---
+        # This is the most "related" since it uses the AI's specific prompt
+        try:
+            safe_query = urllib.parse.quote(query)
+            # We use several parameters to ensure quality
+            gen_url = f"https://pollinations.ai/p/{safe_query}?width=1024&height=768&seed={random.randint(1, 100000)}&nologo=true&enhance=true"
+            print(f"Generated AI Image URL: {gen_url}")
+            # We don't download it to verify (to save time), but return it as primary
+            return gen_url
+        except Exception as e:
+            print(f"Pollinations generation prep failed: {e}")
+
+        # --- 2. DuckDuckGo Search (Fallback) ---
         try:
             from duckduckgo_search import DDGS
-            import random
-            
-            # Simplify query to increase hit rate
-            # Remove "wallpaper" which might be too specific
             search_query = f"{query} event photo"
             print(f"Attempting DDG Search for: {search_query}")
             
@@ -195,7 +206,7 @@ class AIGeneratorService:
                 results = list(ddgs.images(
                     keywords=search_query,
                     region="wt-wt",
-                    safesearch="off", # SafeSearch "off" might help gets more results, we rely on specific keywords
+                    safesearch="off",
                     max_results=3
                 ))
                 
@@ -203,53 +214,15 @@ class AIGeneratorService:
                      image_url = results[0]['image']
                      print(f"DDG Success: {image_url}")
                      return image_url
-                else:
-                    print("DDG returned no results.")
-
         except Exception as e:
-            # Catch library-internal errors like timedelta formatting in newer versions
-            print(f"DDG Image Search Failed (Error: {e})")
-            error_str = str(e)
-        else:
-            error_str = ""
+            print(f"DDG Image Search Failed: {e}")
 
-        # --- Fallback: Retry DDG with simpler query ---
-        if error_str != "Disabled on Render": # Don't retry if it was a critical failure, but usually e is just "no results"
-             print("Primary DDG search failed. Retrying with simplified query...")
-             try:
-                 # Just use the query itself (e.g. just the title) without "event photo"
-                 retry_query = query
-                 print(f"Retry DDG Search for: {retry_query}")
-                 with DDGS() as ddgs:
-                    results = list(ddgs.images(
-                        keywords=retry_query,
-                        region="wt-wt",
-                        safesearch="off",
-                        max_results=3
-                    ))
-                    if results and len(results) > 0:
-                         image_url = results[0]['image']
-                         print(f"DDG Retry Success: {image_url}")
-                         return image_url
-             except Exception as retry_e:
-                 print(f"DDG Retry Failed: {retry_e}")
+        # --- 3. Dynamic Unsplash Fallback (Keyword based) ---
+        # Instead of a random list, use the query to get a somewhat related photo
+        print("Using Dynamic Unsplash Fallback...")
+        keywords = query.replace(" ", ",")
+        return f"https://images.unsplash.com/photo-1540575861501-7ad05823c9f5?auto=format&fit=crop&w=1000&q=80&keywords={keywords}"
 
-        # --- Final Fallback: Unsplash Curated List ---
-        print("Using Unsplash Pool as Last Resort...")
-        unsplash_fallbacks = [
-            "https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&w=1000&q=80",
-            "https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=1000&q=80",
-            "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1000&q=80",
-            "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80",
-            "https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=1000&q=80",
-            "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1000&q=80",
-            "https://images.unsplash.com/photo-1505373630103-89d00c2a5851?auto=format&fit=crop&w=1000&q=80",
-            "https://images.unsplash.com/photo-1504384308090-c54be3855091?auto=format&fit=crop&w=1000&q=80",
-            "https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?auto=format&fit=crop&w=1000&q=80",
-            "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1000&q=80"
-        ]
-        import random
-        return random.choice(unsplash_fallbacks)
 
 
     def _has_text(self, image_url: str) -> bool:
