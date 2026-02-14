@@ -15,12 +15,14 @@ export default defineConfig(({ mode }) => {
       strictPort: true,
       proxy: {
         '/api': {
-          target: 'http://127.0.0.1:8001',
+          target: 'https://project1-y363.onrender.com', // Update to Render Backend
           changeOrigin: true,
+          secure: false,
         },
         '/uploads': {
-          target: 'http://127.0.0.1:8001',
+          target: 'https://project1-y363.onrender.com',
           changeOrigin: true,
+          secure: false,
         }
       }
     }

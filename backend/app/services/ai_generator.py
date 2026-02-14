@@ -186,15 +186,17 @@ class AIGeneratorService:
             from duckduckgo_search import DDGS
             import random
             
-            search_query = f"{query} stock photo photography wallpaper"
+            # Simplify query to increase hit rate
+            # Remove "wallpaper" which might be too specific
+            search_query = f"{query} event photo"
             print(f"Attempting DDG Search for: {search_query}")
             
             with DDGS() as ddgs:
                 results = list(ddgs.images(
                     keywords=search_query,
                     region="wt-wt",
-                    safesearch="on",
-                    max_results=5
+                    safesearch="off", # SafeSearch "off" might help gets more results, we rely on specific keywords
+                    max_results=3
                 ))
                 
                 if results and len(results) > 0:
@@ -208,9 +210,29 @@ class AIGeneratorService:
             # Catch library-internal errors like timedelta formatting in newer versions
             print(f"DDG Image Search Failed (Error: {e})")
 
-        # --- Fallback: Unsplash Curated List ---
-        print("Using Unsplash Fallback...")
-        # 55+ Business/Tech/Event related high-quality images
+        # --- Fallback: Retry DDG with simpler query ---
+        if str(e) != "Disabled on Render": # Don't retry if it was a critical failure, but usually e is just "no results"
+             print("Primary DDG search failed. Retrying with simplified query...")
+             try:
+                 # Just use the query itself (e.g. just the title) without "event photo"
+                 retry_query = query
+                 print(f"Retry DDG Search for: {retry_query}")
+                 with DDGS() as ddgs:
+                    results = list(ddgs.images(
+                        keywords=retry_query,
+                        region="wt-wt",
+                        safesearch="off",
+                        max_results=3
+                    ))
+                    if results and len(results) > 0:
+                         image_url = results[0]['image']
+                         print(f"DDG Retry Success: {image_url}")
+                         return image_url
+             except Exception as retry_e:
+                 print(f"DDG Retry Failed: {retry_e}")
+
+        # --- Final Fallback: Unsplash Curated List ---
+        print("Using Unsplash Pool as Last Resort...")
         unsplash_fallbacks = [
             "https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&w=1000&q=80",
             "https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=1000&q=80",

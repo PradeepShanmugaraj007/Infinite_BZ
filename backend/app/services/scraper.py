@@ -157,7 +157,16 @@ async def scrape_events_playwright(city: str = "chennai", category: str = "busin
             viewport={"width": 1920, "height": 1080},
             ignore_https_errors=True,
             java_script_enabled=True,
-            bypass_csp=True
+            bypass_csp=True,
+            locale="en-US",
+            timezone_id="Asia/Kolkata", # Localize to user's region
+            extra_http_headers={
+                "Accept-Language": "en-US,en;q=0.9",
+                "Upgrade-Insecure-Requests": "1",
+                "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+                "Sec-Ch-Ua-Mobile": "?0",
+                "Sec-Ch-Ua-Platform": '"Windows"'
+            }
         )
         # Import stealth dynamically or at top
         from playwright_stealth import stealth_async
