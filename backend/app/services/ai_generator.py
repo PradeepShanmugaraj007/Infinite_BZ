@@ -209,9 +209,12 @@ class AIGeneratorService:
         except Exception as e:
             # Catch library-internal errors like timedelta formatting in newer versions
             print(f"DDG Image Search Failed (Error: {e})")
+            error_str = str(e)
+        else:
+            error_str = ""
 
         # --- Fallback: Retry DDG with simpler query ---
-        if str(e) != "Disabled on Render": # Don't retry if it was a critical failure, but usually e is just "no results"
+        if error_str != "Disabled on Render": # Don't retry if it was a critical failure, but usually e is just "no results"
              print("Primary DDG search failed. Retrying with simplified query...")
              try:
                  # Just use the query itself (e.g. just the title) without "event photo"
