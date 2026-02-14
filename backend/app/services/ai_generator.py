@@ -147,8 +147,8 @@ class AIGeneratorService:
             if "description" in result:
                 result["description"] = self._clean_description(result["description"])
 
-            # Generate Image (DuckDuckGo Search)
-            search_term = result.get("image_prompt", title)
+            # Generate Image (DuckDuckGo Search using exact title)
+            search_term = title
             
             if search_term:
                 print(f"Searching for image using: {search_term}")
@@ -185,8 +185,8 @@ class AIGeneratorService:
         try:
             from duckduckgo_search import DDGS
             
-            # Refine query for high-relevance professional event photos
-            search_query = f"{query} professional event background"
+            # Use title + 'event' for a clean, related search
+            search_query = f"{query} event"
             print(f"Attempting DDG Search for: {search_query}")
             
             with DDGS() as ddgs:
