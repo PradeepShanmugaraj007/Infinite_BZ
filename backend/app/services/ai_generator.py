@@ -171,7 +171,8 @@ class AIGeneratorService:
         """
         # --- Source 1: Browser-Based DDG Scraping ---
         try:
-            search_query = f"{query} event"
+            # User specifically asked for "[title] event image"
+            search_query = f"{query} event image"
             print(f"DEBUG: Source 1 (Browser Scraping) - Query: {search_query}")
             
             results = await browser_searcher.search_images(search_query)

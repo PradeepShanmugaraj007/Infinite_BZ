@@ -59,13 +59,34 @@ class BrowserSearcher:
                 from playwright_stealth import Stealth
                 await Stealth().apply_stealth_async(page)
                 
-                # Navigate directly to DuckDuckGo Image Search
-                url = f"https://duckduckgo.com/?q={query.replace(' ', '+')}&iax=images&ia=images"
-                print(f"BrowserSearcher: Navigating to {url}")
+                # 1. Navigate to DuckDuckGo Homepage
+                print("BrowserSearcher: Navigating to https://duckduckgo.com/")
+                await page.goto("https://duckduckgo.com/", wait_until="networkidle", timeout=45000)
                 
-                # Wait for navigation and check if blocked
-                await page.goto(url, wait_until="domcontentloaded", timeout=45000)
+                # 2. Type search query into the search field
+                search_query = query
+                print(f"BrowserSearcher: Typing query: '{search_query}'")
                 
+                # DDG search input selectors: #search_form_input_homepage or [name="q"]
+                search_input = await page.wait_for_selector('input[name="q"]', timeout=10000)
+                await search_input.fill(search_query)
+                await search_input.press("Enter")
+                
+                # 3. Wait for results and switch to Images tab
+                print("BrowserSearcher: Waiting for results and switching to Images...")
+                await page.wait_for_load_state("networkidle")
+                
+                # Check for "Images" link in the header or sidebar
+                # Usually: [data-zci-link="images"] or .znav__item--images
+                try:
+                    images_tab = await page.wait_for_selector('a[data-zci-link="images"]', timeout=10000)
+                    await images_tab.click()
+                    print("BrowserSearcher: Switched to Images tab.")
+                except:
+                    print("BrowserSearcher: Could not find Images tab link, trying direct image search URL as backup.")
+                    url = f"https://duckduckgo.com/?q={search_query.replace(' ', '+')}&iax=images&ia=images"
+                    await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+
                 title = await page.title()
                 if "Just a moment" in title or "Access Denied" in title:
                     print("BrowserSearcher: BLOCKED by bot detection.")
