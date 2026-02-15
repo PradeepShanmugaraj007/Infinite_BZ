@@ -190,18 +190,8 @@ class AIGeneratorService:
         except Exception as e:
             print(f"DEBUG: Source 1 CRASHED: {e}")
 
-        # --- Source 2: AI Generation (Pollinations.ai) ---
-        try:
-            print(f"DEBUG: Source 2 (AI Gen) - Title: {query}")
-            gen_url = self._generate_fallback_image(query)
-            if gen_url:
-                print(f"DEBUG: SUCCESS - Using AI Generated image (Bypassing Vision for speed/reliability): {gen_url}")
-                return gen_url
-        except Exception as e:
-            print(f"DEBUG: Source 2 CRASHED: {e}")
-
-        # --- Source 3: Curated Fallbacks ---
-        print("All dynamic methods failed or were 'busy'. Using curated fallback.")
+        # --- Source 2: Curated Fallback (Last Resort) ---
+        print("Scraped candidates failed or were 'busy'. Using curated fallback.")
         fallbacks = [
             "https://images.unsplash.com/photo-1540575861501-7ad05823c9f5?auto=format&fit=crop&w=1000&q=80",
             "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80",
@@ -209,14 +199,7 @@ class AIGeneratorService:
         ]
         return random.choice(fallbacks)
 
-    def _generate_fallback_image(self, title: str) -> str:
-        """Generates a related event image using Pollinations.ai with specific style."""
-        import urllib.parse
-        # Style: Professional Photography, High Resolution, Wide Angle, NO TEXT
-        prompt = f"Professional high-resolution photography of an {title} event, cinematic lighting, wide angle shot, natural environment, zero text, no labels, realistic --no text"
-        encoded_prompt = urllib.parse.quote(prompt)
-        seed = random.randint(1, 999999)
-        return f"https://pollinations.ai/p/{encoded_prompt}?width=1000&height=600&seed={seed}&model=flux&nologo=true"
+
 
     async def _is_image_clean(self, image_url: str) -> bool:
         """
