@@ -61,31 +61,30 @@ class BrowserSearcher:
                 
                 # 1. Navigate to DuckDuckGo Homepage
                 print("BrowserSearcher: Navigating to https://duckduckgo.com/")
-                await page.goto("https://duckduckgo.com/", wait_until="networkidle", timeout=45000)
+                # Use domcontentloaded for speed (networkidle is too slow on Render)
+                await page.goto("https://duckduckgo.com/", wait_until="domcontentloaded", timeout=20000)
                 
                 # 2. Type search query into the search field
                 search_query = query
                 print(f"BrowserSearcher: Typing query: '{search_query}'")
                 
-                # DDG search input selectors: #search_form_input_homepage or [name="q"]
-                search_input = await page.wait_for_selector('input[name="q"]', timeout=10000)
-                await search_input.fill(search_query)
-                await search_input.press("Enter")
-                
-                # 3. Wait for results and switch to Images tab
-                print("BrowserSearcher: Waiting for results and switching to Images...")
-                await page.wait_for_load_state("networkidle")
-                
-                # Check for "Images" link in the header or sidebar
-                # Usually: [data-zci-link="images"] or .znav__item--images
                 try:
-                    images_tab = await page.wait_for_selector('a[data-zci-link="images"]', timeout=10000)
+                    # Faster selector wait
+                    search_input = await page.wait_for_selector('input[name="q"]', timeout=7000)
+                    await search_input.fill(search_query)
+                    await search_input.press("Enter")
+                    
+                    # 3. Wait for results and switch to Images tab
+                    print("BrowserSearcher: Waiting for results...")
+                    await page.wait_for_load_state("domcontentloaded")
+                    
+                    images_tab = await page.wait_for_selector('a[data-zci-link="images"]', timeout=7000)
                     await images_tab.click()
                     print("BrowserSearcher: Switched to Images tab.")
-                except:
-                    print("BrowserSearcher: Could not find Images tab link, trying direct image search URL as backup.")
+                except Exception as e:
+                    print(f"BrowserSearcher: Homepage interaction slow or failed ({e}). Forcing direct image URL.")
                     url = f"https://duckduckgo.com/?q={search_query.replace(' ', '+')}&iax=images&ia=images"
-                    await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+                    await page.goto(url, wait_until="domcontentloaded", timeout=15000)
 
                 title = await page.title()
                 if "Just a moment" in title or "Access Denied" in title:
@@ -93,12 +92,12 @@ class BrowserSearcher:
                     await browser.close()
                     return []
 
-                # Wait for any image tile
+                # Wait for any image tile (Faster timeout)
                 print("BrowserSearcher: Waiting for image tiles...")
                 try:
-                    await page.wait_for_selector(".tile--img, .tile--img__img", timeout=15000)
+                    await page.wait_for_selector(".tile--img, .tile--img__img", timeout=10000)
                 except:
-                    print("BrowserSearcher: Timeout waiting for image tiles. DOM might be different.")
+                    print("BrowserSearcher: Timeout waiting for image tiles.")
                     # Take a screenshot if possible for debugging (not possible here but logging content)
                     html = await page.content()
                     print(f"BrowserSearcher: DOM Snippet: {html[:500]}")

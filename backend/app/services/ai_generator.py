@@ -180,9 +180,11 @@ class AIGeneratorService:
             if not results:
                 print("DEBUG: Source 1 returned NO candidate images.")
             else:
-                print(f"DEBUG: Source 1 found {len(results)} candidates. Testing them with Vision...")
-                for i, img_url in enumerate(results):
-                    print(f"DEBUG: Checking candidate {i+1}/{len(results)}: {img_url}")
+                # Limit to 3 candidates to ensure we fit in Render's 30s timeout
+                candidates = results[:3]
+                print(f"DEBUG: Source 1 found {len(results)} total, testing top {len(candidates)} with Vision...")
+                for i, img_url in enumerate(candidates):
+                    print(f"DEBUG: Checking candidate {i+1}/{len(candidates)}: {img_url}")
                     if await self._is_image_clean(img_url):
                         print(f"DEBUG: SUCCESS - Image {i+1} is clean: {img_url}")
                         return img_url
@@ -262,8 +264,9 @@ class AIGeneratorService:
             )
             
             try:
-                print("DEBUG: Vision - Invoking Gemini Vision model...")
-                response = await self.llm_google.ainvoke([message])
+                print("DEBUG: Vision - Invoking Gemini Vision model (8s timeout)...")
+                # Tighten timeout for Render stability
+                response = await asyncio.wait_for(self.llm_google.ainvoke([message]), timeout=8.0)
                 decision = response.content.strip().upper()
                 print(f"DEBUG: Vision - Gemini Decision: {decision}")
                 return "NO" in decision
