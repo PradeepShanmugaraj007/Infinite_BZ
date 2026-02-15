@@ -8,6 +8,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field
 from typing import List, Optional
+from .browser_searcher import browser_searcher
 
 # Define Pydantic models for Langchain parsing
 class AgendaItem(BaseModel):
@@ -179,61 +180,34 @@ class AIGeneratorService:
 
     async def _search_image(self, query: str) -> Optional[str]:
         """
-        Multi-source search strategy:
-        1. DuckDuckGo (General)
-        2. Unsplash (via DDG)
-        3. Pollinations.ai (AI Generation - High Reliability Fallback)
-        4. Curated Fallback
+        Multi-source search strategy (Playwright-Based):
+        1. DuckDuckGo Browser Scraping (Requested by user)
+        2. Pollinations.ai (AI Generation - High Reliability Fallback)
+        3. Curated Fallback
         All results are filtered by Gemini Vision.
         """
-        # --- Source 1: DuckDuckGo General ---
+        # --- Source 1: Browser-Based DDG Scraping ---
         try:
-            from duckduckgo_search import DDGS
             search_query = f"{query} event"
-            print(f"Attempting Source 1 (DDG): {search_query}")
+            print(f"Attempting Source 1 (Browser Scraping): {search_query}")
             
-            with DDGS() as ddgs:
-                results = list(ddgs.images(
-                    keywords=search_query,
-                    region="wt-wt",
-                    safesearch="off",
-                    max_results=8
-                ))
-                
-                if results:
-                    for res in results[:5]:
-                        img_url = res['image']
-                        if await self._is_image_clean(img_url):
-                            print(f"DDG Success (Clean): {img_url}")
-                            return img_url
-        except Exception as e:
-            print(f"DDG Source 1 Failed: {e}")
-
-        # --- Source 2: Unsplash Dynamic Search (via DDG) ---
-        try:
-            from duckduckgo_search import DDGS
-            unsplash_query = f"site:unsplash.com {query} professional event"
-            print(f"Attempting Source 2 (Unsplash via DDG): {unsplash_query}")
+            # Use Playwright to scrape the website directly
+            results = await browser_searcher.search_images(search_query)
             
-            with DDGS() as ddgs:
-                results = list(ddgs.images(
-                    keywords=unsplash_query,
-                    max_results=5
-                ))
-                
-                if results:
-                    for res in results:
-                        img_url = res['image']
-                        if await self._is_image_clean(img_url):
-                            print(f"Unsplash Search Success (Clean): {img_url}")
-                            return img_url
+            if results:
+                for img_url in results:
+                    print(f"Vision Checking browser-scraped image: {img_url}")
+                    if await self._is_image_clean(img_url):
+                        print(f"Browser Search Success (Clean): {img_url}")
+                        return img_url
+                    else:
+                        print(f"Skipping browser-scraped image with text: {img_url}")
         except Exception as e:
-            print(f"Unsplash Source 2 Failed: {e}")
+            print(f"Source 1 (Browser Scraping) Failed: {e}")
 
-        # --- Source 3: AI Generation (Pollinations.ai) ---
-        # This is high-reliability because it won't block the server IP
+        # --- Source 2: AI Generation (Pollinations.ai) ---
         try:
-            print(f"Attempting Source 3 (AI Generation - Pollinations): {query}")
+            print(f"Attempting Source 2 (AI Generation - Pollinations): {query}")
             gen_url = self._generate_fallback_image(query)
             if gen_url:
                 print(f"Checking generated image for quality/text: {gen_url}")
@@ -241,9 +215,9 @@ class AIGeneratorService:
                     print(f"AI Generation Success (Clean): {gen_url}")
                     return gen_url
         except Exception as e:
-            print(f"Source 3 (AI Gen) Failed: {e}")
+            print(f"Source 2 (AI Gen) Failed: {e}")
 
-        # --- Source 4: Curated Fallbacks ---
+        # --- Source 3: Curated Fallbacks ---
         print("All dynamic methods failed or were 'busy'. Using curated fallback.")
         fallbacks = [
             "https://images.unsplash.com/photo-1540575861501-7ad05823c9f5?auto=format&fit=crop&w=1000&q=80",
