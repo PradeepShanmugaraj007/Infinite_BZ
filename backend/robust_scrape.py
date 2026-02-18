@@ -32,8 +32,8 @@ async def save_events(events, source_name):
                 event = Event(**data)
                 session.add(event)
                 added += 1
-            else:
-                updated += 1
+            # else:
+            #     updated += 1
         await session.commit()
         print(f"[{source_name}] Saved: {added} New, {updated} Updated.")
 
