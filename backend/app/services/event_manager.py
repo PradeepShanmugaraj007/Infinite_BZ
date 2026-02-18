@@ -65,9 +65,21 @@ async def run_full_scrape_cycle():
                 event = Event(**data)
                 session.add(event)
                 added += 1
-            # else:
-            #     # SKIP UPDATES for existing events to prevent overwriting user changes or duplicates
-            #     pass
+            else:
+                # Comprehensive Update Logic
+                existing.title = data['title']
+                existing.description = data['description']
+                existing.start_time = data['start_time']
+                existing.end_time = data['end_time']
+                existing.venue_name = data['venue_name']
+                existing.venue_address = data.get('venue_address')
+                existing.organizer_name = data.get('organizer_name')
+                existing.image_url = data.get('image_url')
+                existing.is_free = data.get('is_free', False)
+                existing.online_event = data.get('online_event', False)
+                existing.url = data['url']
+                existing.raw_data = data.get('raw_data', {})
+                updated += 1
         
         await session.commit()
         print(f"EVENT MANAGER: DB Saved {added} new, Updated {updated}.")
