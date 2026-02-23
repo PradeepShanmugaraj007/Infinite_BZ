@@ -22,24 +22,18 @@ async def trigger_refresh(background_tasks: BackgroundTasks):
 
     print("API: Triggering scraper inside FastAPI background task...")
     
-    # We define a sync wrapper to run the async cycle 
-    # because BackgroundTasks sometimes have issues with complex async loops
-    def run_scraper_sync():
-        import asyncio
+    # Use an async wrapper so FastAPI runs it natively on the main event loop
+    # This prevents the "attached to a different loop" error with SQLAlchemy's async engine.
+    async def run_scraper_async():
         from app.services.event_manager import run_full_scrape_cycle
-        print("API [Background Worker]: Starting scrape cycle...", flush=True)
-        # Create a new event loop for this thread just in case
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
+        print("API [Background Worker]: Starting scrape cycle on main loop...", flush=True)
         try:
-            loop.run_until_complete(run_full_scrape_cycle())
+            await run_full_scrape_cycle()
             print("API [Background Worker]: Scrape cycle finished.", flush=True)
         except Exception as e:
             print(f"API [Background Worker]: Scrape cycle failed with error: {e}", flush=True)
-        finally:
-            loop.close()
 
-    background_tasks.add_task(run_scraper_sync)
+    background_tasks.add_task(run_scraper_async)
     
     return {
         "status": "accepted",
