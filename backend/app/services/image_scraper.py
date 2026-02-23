@@ -2,6 +2,8 @@ import aiohttp
 import urllib.parse
 from bs4 import BeautifulSoup
 import re
+import asyncio
+from duckduckgo_search import DDGS
 
 class DuckDuckGoImageScraper:
     def __init__(self):
@@ -12,51 +14,41 @@ class DuckDuckGoImageScraper:
 
     async def get_image_url(self, event_title: str) -> str:
         """
-        Searches DDG HTML for '{title} image without text on it with full hd' and extracts the first valid image URL.
+        Uses the dedicated duckduckgo-search package to stably fetch '{title} image without text on it with full hd'.
+        This bypassed Cloudflare 403s and guarantees a real image.
         """
-        # Formulate query as requested by user
         query = f"{event_title} image without text on it with full hd"
-        print(f"DEBUG ImageScraper: Searching DDG for: '{query}'")
+        print(f"DEBUG ImageScraper: Searching via DDGS library for: '{query}'")
         
-        url = f"{self.base_url}?q={urllib.parse.quote(query)}"
-
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, headers=self.headers, timeout=10) as response:
-                    if response.status != 200:
-                        print(f"DEBUG ImageScraper: Failed to fetch DDG, status {response.status}")
-                        return ""
-                    
-                    html = await response.text()
-                    soup = BeautifulSoup(html, "html.parser")
-                    
-                    # In DDG HTML, image links are often routed through their proxy
-                    # Example: <a class="imageElement" href="...&vqd=..."><img src="//external-content.duckduckgo.com/iu/?u=REAL_URL&f=1" /></a>
-                    
-                    images = soup.find_all("img", class_="zcm-wrap-img") # Or try finding all imgs in external-content
-                    if not images:
-                         # Fallback for basic HTML page structure
-                         images = soup.find_all("img")
-                    
-                    for img in images:
-                        src = img.get("src", "")
-                        
-                        # DuckDuckGo proxies image results through external-content
-                        if "external-content.duckduckgo.com" in src:
-                            src = "https:" + src if src.startswith("//") else src
-                            # Extract the *actual* original URL if we want, or just use the proxied one.
-                            # The proxied one is actually better because it prevents CORS/hotlinking issues!
-                            return src
-                        
-                        # Standard image fallback (skip icons and tracking pixels)
-                        elif src.startswith("http") and not any(x in src.lower() for x in ['logo', 'icon', 'tracker', 'pixel']):
-                             return src
+            # Run the synchronous DDGS search in an executor thread to avoid blocking asyncio
+            def fetch_images():
+                with DDGS() as ddgs:
+                    # Request up to 10 images to ensure we can filter out junk
+                    return list(ddgs.images(query, max_results=10))
 
-            print("DEBUG ImageScraper: No suitable image found in the DDG results.")
+            results = await asyncio.to_thread(fetch_images)
+            
+            if not results:
+                print("DEBUG ImageScraper: DDGS library returned no images.")
+                return ""
+                
+            for item in results:
+                img_url = item.get("image", "")
+                
+                # Apply strict filtering to skip junk
+                img_lower = img_url.lower()
+                if not img_url or any(x in img_lower for x in ['.ico', 'favicon', 'logo', 'icon', 'tracker', 'pixel', 'avatar', 'profile', '.svg']):
+                    continue
+                    
+                print(f"DEBUG ImageScraper: SUCCESS! Found clean HD image via DDGS: {img_url}")
+                return img_url
+
+            print("DEBUG ImageScraper: Exhausted DDGS results without finding a clean HD image.")
             return ""
             
         except Exception as e:
-            print(f"DEBUG ImageScraper: Error during DDG scrape: {e}")
+            print(f"DEBUG ImageScraper: Error during DDGS scrape: {e}")
             return ""
 
 # Expose a singleton instance
