@@ -136,18 +136,18 @@ class AIGeneratorService:
             print(f"DEBUG: Starting Fast DDG Proxy Image Search for: {title}")
             try:
                 # Use a fast 10-second timeout
-                image_url = await asyncio.wait_for(image_scraper_service.get_image_url(f"{title} image without text"), timeout=10.0)
+                image_url = await asyncio.wait_for(image_scraper_service.get_image_url(title), timeout=10.0)
                 if not image_url:
-                    print("DEBUG: Proxy Image search returned nothing. Using reliable fallback.")
-                    result["imageUrl"] = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1000&q=80"
+                    print("DEBUG: Proxy Image search returned nothing.")
+                    result["imageUrl"] = ""
                 else:
                     result["imageUrl"] = image_url
             except asyncio.TimeoutError:
-                print("DEBUG: Image search hit global 10s limit. Returning fallback image.")
-                result["imageUrl"] = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1000&q=80"
+                print("DEBUG: Image search hit global 10s limit.")
+                result["imageUrl"] = ""
             except Exception as search_err:
-                print(f"DEBUG: Image search crashed heavily: {search_err}. Using fallback.")
-                result["imageUrl"] = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1000&q=80"
+                print(f"DEBUG: Image search crashed heavily: {search_err}.")
+                result["imageUrl"] = ""
 
             return result
 
